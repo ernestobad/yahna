@@ -69,7 +69,7 @@ function getDynamoDBValueObject(value, type, useDefaultValueIfNull = false) {
     }
 }
 
-async function saveItemAsync(item, pkey) {
+async function saveItemAsync(item, pkey, skey) {
     const promise = new Promise(function (resolve, reject) {
 
         if (!item.id || !item.type) {
@@ -81,6 +81,8 @@ async function saveItemAsync(item, pkey) {
             TableName: "hnews",
             Item: {
                 pkey: getDynamoDBValueObject(pkey, "S"),
+                skey: getDynamoDBValueObject(skey, "N"),
+                
                 id: getDynamoDBValueObject(item.id, "N"),
                 deleted: getDynamoDBValueObject(item.deleted, "BOOL"),
                 type: getDynamoDBValueObject(item.type, "S"),
@@ -147,10 +149,10 @@ async function queryRootIdAsync(itemId) {
     const params = {
         TableName: "hnews",
         ProjectionExpression: "root",
-        KeyConditionExpression: "pkey = :pkey AND id = :id",
+        KeyConditionExpression: "pkey = :pkey AND skey = :skey",
         ExpressionAttributeValues: {
             ":pkey": "all",
-            ":id": itemId
+            ":skey": itemId
         }
     };
     const promise = new Promise(function (resolve, reject) {
@@ -195,9 +197,9 @@ async function resolveRootAndSaveAsync(item) {
     }
     
     if (item.root > 0) {
-        await saveItemAsync(item, "all");
+        await saveItemAsync(item, "all", item.id);
             if (item.root > 0 && item.root != item.id) {
-                await saveItemAsync(item, item.root.toString());
+                await saveItemAsync(item, item.root.toString(), item.id);
             }
     }
 

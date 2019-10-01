@@ -61,6 +61,8 @@ class DatabaseManager {
     // In the case of stories or polls, the total comment count.
     private let descendantsCountCol = Expression<Int64?>("descendants_count")
     
+    // TODO: views table.
+    
     private var db: Connection?
     
     private let concurrentQueue = DispatchQueue(label: "DatabaseManager.concurrentQueue", attributes: .concurrent)

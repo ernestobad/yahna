@@ -19,31 +19,18 @@ enum ItemType: String {
 struct Item : Identifiable {
     
     let id: Int64
-    
     let deleted: Bool
-    
     let type: ItemType
-    
     let by: String?
-    
     let time: Date
-    
     let text: String?
-    
     let dead: Bool
-    
     let parent: Int64?
-    
     let childOrder: Int64?
-    
     let poll: Int64?
-    
     let pollOptionOrder: Int64?
-    
     let url: String?
-    
     let score: Int64?
-    
     let title: String?
     
     let descendantsCount: Int64?
@@ -101,5 +88,21 @@ struct Item : Identifiable {
         descendantsCount = jsonItem.descendants
         childOrder = nil
         pollOptionOrder = nil
+    }
+    
+    var domain: String {
+        guard let urlString = self.url,
+            let url = URL(string: urlString),
+            let host = url.host else {
+                return ""
+        }
+        
+        let tokens = host.split(separator: Character("."))
+        
+        guard tokens.count >= 2 else {
+            return ""
+        }
+        
+        return "\(tokens[tokens.count-2]).\(tokens[tokens.count-1])"
     }
 }

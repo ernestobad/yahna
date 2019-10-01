@@ -9,13 +9,27 @@
 import Foundation
 import Combine
 
-class DataModel : ObservableObject {
+class ItemsDataModel : ObservableObject {
     
-    @Published var isLoading: Bool = false
+    let parentId: ParentId
+    
+    @Published var isRefreshing: Bool = false
     
     @Published var items: [Item] = [Item]()
     
+    @Published var parentItem: Item?
+    
     @Published var error: Error?
+    
+    init(_ parentId: ParentId) {
+        self.parentId = parentId
+        self.parentItem = nil
+    }
+    
+    init(_ parentItem: Item) {
+        self.parentId = ParentId.item(id: parentItem.id)
+        self.parentItem = parentItem
+    }
 }
 
 class DataProvider {
@@ -24,20 +38,35 @@ class DataProvider {
         case invalidItem
     }
     
-    public var topStories = DataModel()
-    
     public static let shared = DataProvider()
     
-    func refreshTopStories() -> AnyCancellable {
-        refreshDataModel(self.topStories, itemIdsPublisher: NetworkDataProvider.shared.getTopStories())
-    }
-    
-    func refreshDataModel(_ dataModel: DataModel, itemIdsPublisher: AnyPublisher<[Int64], Error>) -> AnyCancellable {
+    public func refreshDataModel(_ dataModel: ItemsDataModel) -> AnyCancellable {
         
-        DispatchQueue.main.async { dataModel.isLoading = true }
+        DispatchQueue.main.async { dataModel.isRefreshing = true }
         
-        return itemIdsPublisher
-            .flatMap({ (ids) -> AnyPublisher<[Item], Error> in self.getItems(ids: ids) })
+        let combinedPublisher: AnyPublisher<(Item?, [Item]), Error>
+                
+        let parentPublisher: AnyPublisher<Item?, Error>
+        
+        if case let ParentId.item(id: id) = dataModel.parentId {
+            parentPublisher = NetworkDataProvider.shared.getItem(id: id)
+                .tryMap { (jsonItem) -> Item? in
+                    guard let item = Item(jsonItem: jsonItem) else { throw DataProviderError.invalidItem }
+                    return item
+            }.eraseToAnyPublisher()
+        } else {
+            parentPublisher = Just(nil as Item?).tryMap({ $0 }).eraseToAnyPublisher()
+        }
+        
+        let itemsPublisher = NetworkDataProvider.shared.getItems(dataModel.parentId)
+            .tryMap({ (jsonItems) -> [Item] in jsonItems.compactMap { (jsonItem) in Item(jsonItem: jsonItem) } })
+            .eraseToAnyPublisher()
+        
+        combinedPublisher = parentPublisher
+            .combineLatest(itemsPublisher)
+            .eraseToAnyPublisher()
+        
+        return combinedPublisher
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
@@ -46,8 +75,9 @@ class DataProvider {
                 case .failure(let anError):
                     dataModel.error = anError
                 }
-                dataModel.isLoading = false
-            }, receiveValue: { (items) in
+                dataModel.isRefreshing = false
+            }, receiveValue: { (parent, items) in
+                dataModel.parentItem = parent
                 dataModel.items = items
             })
     }

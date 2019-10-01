@@ -10,18 +10,17 @@ import SwiftUI
 
 struct HomeView: View {
     
-    @ObservedObject var topStories: DataModel
+    @ObservedObject var dataModel: ItemsDataModel
     
     var body: some View {
         NavigationView {
-            List(topStories.items) { (item: Item) in
-                HStack {
-                    Text(item.title ?? "")
-                    Text(item.text ?? "")
-                }
-            }
+            // todo: try foreach per video
+            List(dataModel.items) {
+                ItemCellView(item: $0)//.padding(.bottom).padding(-20)
+            }.navigationBarTitle(Text("Top Stories"))
         }.onAppear {
-            _ = DataProvider.shared.refreshTopStories()
+            UITableView.appearance().separatorColor = .clear
+            _ = DataProvider.shared.refreshDataModel(self.dataModel)
         }
     }
 }
@@ -33,7 +32,7 @@ struct HomeView_Previews: PreviewProvider {
         items.append(Item(id: 1,
                           deleted: false,
                           type: ItemType.story,
-                          by: "gkpnk",
+                          by: "foobar",
                           time: Date(),
                           text: "test test 1",
                           dead: false,
@@ -41,15 +40,15 @@ struct HomeView_Previews: PreviewProvider {
                           childOrder: 1,
                           poll: nil,
                           pollOptionOrder: nil,
-                          url: nil,
-                          score: 100,
-                          title: "test1",
-                          descendantsCount: 0))
+                          url: "https://www.reuters.com/article/us-wework-ipo/wework-says-will-file-to-withdraw-ipo-idUSKBN1WF1NS",
+                          score: 312,
+                          title: "WeWork says will file to withdraw IPO, WeWork says will file to withdraw IPO",
+                          descendantsCount: 30))
         
         items.append(Item(id: 2,
                           deleted: false,
                           type: ItemType.story,
-                          by: "gkpnk",
+                          by: "foobar",
                           time: Date(),
                           text: "test test 2",
                           dead: false,
@@ -57,15 +56,15 @@ struct HomeView_Previews: PreviewProvider {
                           childOrder: 1,
                           poll: nil,
                           pollOptionOrder: nil,
-                          url: nil,
+                          url: "https://www.reuters.com/article/us-wework-ipo/wework-says-will-file-to-withdraw-ipo-idUSKBN1WF1N",
                           score: 100,
                           title: "test2",
                           descendantsCount: 0))
         
-        let topStories = DataModel()
+        let topStories = ItemsDataModel(.topStories)
         topStories.items = items
         topStories.error = nil
         
-        return HomeView(topStories: topStories)
+        return HomeView(dataModel: topStories)
     }
 }

@@ -72,7 +72,7 @@ function getDynamoDBValueObject(value, type, useDefaultValueIfNull = false) {
     }
 }
 
-async function saveItemAsync(item, pkey) {
+async function saveItemAsync(item, pkey, skey) {
     const promise = new Promise(function (resolve, reject) {
 
         if (!item.id || !item.type) {
@@ -84,6 +84,8 @@ async function saveItemAsync(item, pkey) {
             TableName: "hnews",
             Item: {
                 pkey: getDynamoDBValueObject(pkey, "S"),
+                skey: getDynamoDBValueObject(skey, "N"),
+                
                 id: getDynamoDBValueObject(item.id, "N"),
                 deleted: getDynamoDBValueObject(item.deleted, "BOOL"),
                 type: getDynamoDBValueObject(item.type, "S"),
@@ -112,77 +114,49 @@ async function saveItemAsync(item, pkey) {
     return promise;
 }
 
-async function deleteItemsBatchAsync(itemIds, pkey) {
-
-    var deleteRequests = [];
-    itemIds.forEach(function (itemId) {
-        deleteRequests.push({
-            DeleteRequest: {
-                Key: {
-                    pkey: getDynamoDBValueObject(pkey, "S"),
-                    id: getDynamoDBValueObject(itemId, "N")
-                }
-            }
-        });
-    });
-
-    var params = {
-        RequestItems: {
-            "hnews": deleteRequests
-        }
-    };
-
-    const promise = new Promise(function (resolve, reject) {
-        dynamodb.batchWriteItem(params, function (err, data) {
-            if (err) {
-                reject(err);
-            } else {
-                resolve(true);
-            }
-        });
-    });
-    return promise;
-}
-
-async function deleteItemsAsync(itemIds, pkey) {
-    const itemIdsBatches = batches(itemIds, 25);
+async function deleteItemsAsync(pkey, skeys) {
+    const skeysBatches = batches(skeys, 25);
     var promises = [];
-    itemIdsBatches.forEach(function (itemIdsBatch) {
-        promises.push(deleteItemsBatchAsync(itemIdsBatch, pkey));
+    skeysBatches.forEach(function (skeysBatch) {
+
+        var deleteRequests = [];
+        skeysBatch.forEach(function (skey) {
+            deleteRequests.push({
+                DeleteRequest: {
+                    Key: {
+                        pkey: getDynamoDBValueObject(pkey, "S"),
+                        skey: getDynamoDBValueObject(skey, "N")
+                    }
+                }
+            });
+        });
+    
+        var params = {
+            RequestItems: {
+                "hnews": deleteRequests
+            }
+        };
+    
+        const promise = new Promise(function (resolve, reject) {
+            dynamodb.batchWriteItem(params, function (err, data) {
+                if (err) {
+                    reject(err);
+                } else {
+                    resolve(true);
+                }
+            });
+        });
+
+        promises.push(promise);
     });
+
     await Promise.all(promises);
 }
 
-async function queryItemAsync(pkey, id) {
+async function querySKeysAsync(pkey) {
     const params = {
         TableName: "hnews",
-        ProjectionExpression: "id",
-        KeyConditionExpression: "pkey = :pkey and id = :id",
-        ExpressionAttributeValues: {
-            ":pkey": pkey,
-            ":id": id
-        }
-    };
-    const promise = new Promise(function (resolve, reject) {
-        docClient.query(params, function (err, data) {
-            if (err) {
-                reject(err);
-            } else {
-                if (data.Items.length > 0) {
-                    resolve(data.Items[0]);
-                } else {
-                    resolve(null);
-                }
-            }
-        });
-    });
-    return promise;
-}
-
-async function queryItemsIdsAsync(pkey) {
-    const params = {
-        TableName: "hnews",
-        ProjectionExpression: "id",
+        ProjectionExpression: "skey",
         KeyConditionExpression: "pkey = :pkey",
         ExpressionAttributeValues: {
             ":pkey": pkey
@@ -193,38 +167,35 @@ async function queryItemsIdsAsync(pkey) {
             if (err) {
                 reject(err);
             } else {
-                var itemIds = [];
+                var skeys = [];
                 data.Items.forEach(function (item) {
-                    if (item.id) {
-                        itemIds.push(item.id);
+                    if (typeof item.skey !== "undefined") {
+                        skeys.push(item.skey);
                     }
                 });
-                resolve(itemIds);
+                resolve(skeys);
             }
         });
     });
     return promise;
 }
 
-async function deleteItemsNotFoundInAsync(itemIds, pkey) {
+async function deleteItemsAfterAsync(pkey, skey) {
 
-    const foundItemIds = await queryItemsIdsAsync(pkey);
+    const foundSKeys = await querySKeysAsync(pkey);
 
-    var itemIdsMap = {};
-    itemIds.forEach(itemId => itemIdsMap[itemId] = true);
-
-    var itemIdsToDelete = [];
-    foundItemIds.forEach(function (foundItemId) {
-        if (!(foundItemId in itemIdsMap)) {
-            itemIdsToDelete.push(foundItemId);
+    var skeysToDelete = [];
+    foundSKeys.forEach(function (foundSKey) {
+        if (foundSKey > skey) {
+            skeysToDelete.push(foundSKey);
         }
     });
 
-    console.info("--- Deleting " + itemIdsToDelete.length + " items in pkey:" + pkey + ".");
-    await deleteItemsAsync(itemIdsToDelete, pkey);
+    console.info("--- Deleting " + skeysToDelete.length + " items in pkey:" + pkey + ".");
+    await deleteItemsAsync(pkey, skeysToDelete);
 }
 
-async function fetchAndSaveItem(itemId, pkey) {
+async function fetchAndSaveItem(itemId, pkey, skey) {
 
     const url = getItemUrl(itemId);
     const item = await fetchAsync(url);
@@ -233,7 +204,7 @@ async function fetchAndSaveItem(itemId, pkey) {
         throw Error("Invalid item received");
     }
 
-    await saveItemAsync(item, pkey);
+    await saveItemAsync(item, pkey, skey);
 
     return true;
 }
@@ -256,20 +227,22 @@ async function fetchIdsAndItemsAsync(url, pkey) {
     console.info("--- Fetching " + ids.length + " items in batches of " + batchSize + ".");
     var successCount = 0;
 
+    var skey = 0;
     var idsBatches = batches(ids, batchSize);
     var idsBatch;
     for (idsBatch of idsBatches) {
         var promises = [];
         var id;
         for (id of idsBatch) {
-            promises.push(fetchAndSaveItem(id, pkey).catch(errorHandler));
+            promises.push(fetchAndSaveItem(id, pkey, skey).catch(errorHandler));
+            skey += 1;
         }
         const results = await Promise.all(promises);
         successCount += results.filter(r => r).length;
     }
 
     console.info("--- Fetched and saved " + successCount + " items successfuly.");
-    await deleteItemsNotFoundInAsync(ids, pkey);
+    await deleteItemsAfterAsync(pkey, skey);
 }
 
 exports.handler = async (event, context) => {
