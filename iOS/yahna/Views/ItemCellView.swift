@@ -21,7 +21,8 @@ struct ItemCellView: View {
                 Text(verbatim: item.time.toTimeString()).foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
                 Spacer()
                 Text(verbatim: item.domain ).foregroundColor(Color(UIColor.systemTeal)).font(.subheadline)
-            }.padding([.leading, .top, .trailing])
+            }.padding([.leading, .trailing])
+                .fixedSize()
             
             HStack {
                 Text(verbatim: item.title ?? "")
@@ -53,10 +54,10 @@ struct ItemCellView: View {
                     .foregroundColor(Color(UIColor.systemGray))
                     .font(.subheadline)
                 
-            }.padding([.leading, .trailing])
-            Spacer()
+                }.padding([.leading, .trailing])
+            .fixedSize()
             Divider()
-        }.padding([.bottom])
+        }
     }
 }
 

@@ -17,6 +17,7 @@
 		948B37CE234101ED0062C229 /* ParentId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37CD234101ED0062C229 /* ParentId.swift */; };
 		948B37D2234167FD0062C229 /* ItemCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37D1234167FD0062C229 /* ItemCellView.swift */; };
 		948B37D523416B170062C229 /* DateExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37D423416B170062C229 /* DateExtensions.swift */; };
+		948B37D72343D9060062C229 /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37D62343D9060062C229 /* ListView.swift */; };
 		94E100F52332B0D700721E4D /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E100F42332B0D700721E4D /* DatabaseManager.swift */; };
 		94E100F82332BF3D00721E4D /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94E100F72332BF3D00721E4D /* SQLite.framework */; };
 		94E100FD2332E51300721E4D /* Item.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E100FC2332E51300721E4D /* Item.swift */; };
@@ -41,6 +42,7 @@
 		948B37CD234101ED0062C229 /* ParentId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentId.swift; sourceTree = "<group>"; };
 		948B37D1234167FD0062C229 /* ItemCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemCellView.swift; sourceTree = "<group>"; };
 		948B37D423416B170062C229 /* DateExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DateExtensions.swift; sourceTree = "<group>"; };
+		948B37D62343D9060062C229 /* ListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ListView.swift; sourceTree = "<group>"; };
 		94E100F42332B0D700721E4D /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		94E100F72332BF3D00721E4D /* SQLite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SQLite.framework; path = yahna/Carthage/Build/iOS/SQLite.framework; sourceTree = "<group>"; };
 		94E100FC2332E51300721E4D /* Item.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Item.swift; sourceTree = "<group>"; };
@@ -141,6 +143,7 @@
 			children = (
 				943FCD2F232D13F30051B94C /* HomeView.swift */,
 				948B37D1234167FD0062C229 /* ItemCellView.swift */,
+				948B37D62343D9060062C229 /* ListView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -256,6 +259,7 @@
 				943FCD2E232D13F30051B94C /* SceneDelegate.swift in Sources */,
 				948B37CC2340F50E0062C229 /* JsonItem.swift in Sources */,
 				94E101042333D1EE00721E4D /* NetworkDataProvider.swift in Sources */,
+				948B37D72343D9060062C229 /* ListView.swift in Sources */,
 				943FCD30232D13F30051B94C /* HomeView.swift in Sources */,
 				94E101022333A8CB00721E4D /* Log.swift in Sources */,
 				948B37D523416B170062C229 /* DateExtensions.swift in Sources */,
