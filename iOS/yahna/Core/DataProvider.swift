@@ -9,29 +9,6 @@
 import Foundation
 import Combine
 
-class ItemsDataModel : ObservableObject {
-    
-    let parentId: ParentId
-    
-    @Published var isRefreshing: Bool = false
-    
-    @Published var items: [Item] = [Item]()
-    
-    @Published var parentItem: Item?
-    
-    @Published var error: Error?
-    
-    init(_ parentId: ParentId) {
-        self.parentId = parentId
-        self.parentItem = nil
-    }
-    
-    init(_ parentItem: Item) {
-        self.parentId = ParentId.item(id: parentItem.id)
-        self.parentItem = parentItem
-    }
-}
-
 class DataProvider {
     
     enum DataProviderError : Error {

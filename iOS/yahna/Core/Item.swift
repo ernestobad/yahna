@@ -105,4 +105,24 @@ struct Item : Identifiable {
         
         return "\(tokens[tokens.count-2]).\(tokens[tokens.count-1])"
     }
+    
+    var urlWithoutProtocol: String {
+        
+        guard let urlString = self.url else {
+            return ""
+        }
+        
+        let httpPrefix = "http://"
+        let httpsPrefix = "https://"
+        
+        if urlString.starts(with: httpPrefix) {
+            let idx = urlString.index(urlString.startIndex, offsetBy: httpPrefix.count)
+            return String(urlString.suffix(from: idx))
+        } else if urlString.starts(with: httpsPrefix) {
+            let idx = urlString.index(urlString.startIndex, offsetBy: httpsPrefix.count)
+            return String(urlString.suffix(from: idx))
+        } else {
+            return urlString
+        }
+    }
 }

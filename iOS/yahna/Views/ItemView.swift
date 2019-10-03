@@ -1,18 +1,16 @@
 //
-//  ItemCellView.swift
+//  ItemView.swift
 //  yahna
 //
-//  Created by Ernesto Badillo on 9/29/19.
+//  Created by Ernesto Badillo on 10/2/19.
 //  Copyright © 2019 Ernesto Badillo. All rights reserved.
 //
 
 import SwiftUI
 
-struct ItemCellView: View {
+struct ItemView: View {
     
     var item: Item
-    
-    @EnvironmentObject var webViewState: WebViewState
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -21,35 +19,31 @@ struct ItemCellView: View {
                 Text(verbatim: "@\(item.by ?? "")").foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
                 Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
                 Text(verbatim: item.time.toTimeString()).foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
+                Spacer()
+                Text(verbatim: item.domain ).foregroundColor(Color(UIColor.systemTeal)).font(.subheadline)
             }.padding([.leading, .trailing])
-                .fixedSize(horizontal: false, vertical: true)
+                .fixedSize()
             
             HStack {
                 Text(verbatim: item.title ?? "")
                     .font(.body)
                     .lineLimit(nil)
-            }.padding(.horizontal)
-            
-            Button(action: {
-                if let urlString = self.item.url, let url = URL(string: urlString) {
-                    self.webViewState.url = url
-                    self.webViewState.isShowing = true
-                }
-            }) {
-                Text(verbatim: item.urlWithoutProtocol)
-                    .lineLimit(1)
-                    .foregroundColor(Color(UIColor.systemTeal))
-                    .font(.subheadline)
-                    .padding(.horizontal)
-            }
+            }.padding([.leading, .trailing])
             
             HStack(spacing:4) {
                 
-                Text(verbatim: "\(item.score ?? 0) points")
+                Image(systemName: "arrow.up")
+                    .resizable()
+                    .frame(width: 14, height: 14, alignment: .center)
+                    .foregroundColor(Color(UIColor.systemGray))
+                
+                Text(verbatim: "\(item.score ?? 0)")
                     .foregroundColor(Color(UIColor.systemGray))
                     .font(.subheadline)
                 
-                Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
+                Spacer()
+                    .fixedSize()
+                    .frame(width: 20, height: 16, alignment: .center)
                 
                 Image(systemName: "bubble.left.and.bubble.right")
                     .resizable()
@@ -60,16 +54,15 @@ struct ItemCellView: View {
                     .foregroundColor(Color(UIColor.systemGray))
                     .font(.subheadline)
                 
-            }.padding(.horizontal)
-            .fixedSize(horizontal: false, vertical: true)
-            
+                }.padding([.leading, .trailing])
+            .fixedSize()
             Divider()
+            Spacer()
         }
     }
 }
 
-struct ItemCellView_Previews: PreviewProvider {
-    
+struct ItemView_Previews: PreviewProvider {
     static var previews: some View {
         
         let item = Item(id: 1,
@@ -88,11 +81,11 @@ struct ItemCellView_Previews: PreviewProvider {
                         title: "WeWork says will file to withdraw IPO, WeWork says will file to withdraw IPO",
                         descendantsCount: 30)
         
-        let itemCellView = ItemCellView(item: item)
+        let itemView = ItemView(item: item)
         
         return Group {
-            itemCellView.environment(\.colorScheme, .light)
-           itemCellView.environment(\.colorScheme, .dark)
-        }.previewLayout(.fixed(width: 300, height: 300)).background(Color(UIColor.systemBackground))
+            itemView.environment(\.colorScheme, .light)
+           itemView.environment(\.colorScheme, .dark)
+        }.background(Color(UIColor.systemBackground))
     }
 }

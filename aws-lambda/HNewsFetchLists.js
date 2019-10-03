@@ -8,6 +8,7 @@ AWS.config.update({region: 'us-west-2'});
 const topStoriesUrl = "https://hacker-news.firebaseio.com/v0/topstories.json";
 const newStoriesUrl = "https://hacker-news.firebaseio.com/v0/newstories.json";
 const askStoriesUrl = "https://hacker-news.firebaseio.com/v0/askstories.json";
+const showStoriesUrl = "https://hacker-news.firebaseio.com/v0/showstories.json";
 const jobStoriesUrl = "https://hacker-news.firebaseio.com/v0/jobstories.json";
 
 function getItemUrl(itemId) {
@@ -251,6 +252,7 @@ exports.handler = async (event, context) => {
     await fetchIdsAndItemsAsync(newStoriesUrl, "newstories");
     await fetchIdsAndItemsAsync(askStoriesUrl, "askstories");
     await fetchIdsAndItemsAsync(jobStoriesUrl, "jobstories");
+    await fetchIdsAndItemsAsync(showStoriesUrl, "showstories");
 
     const response = {
         statusCode: 200,

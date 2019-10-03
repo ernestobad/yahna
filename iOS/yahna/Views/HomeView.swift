@@ -10,19 +10,60 @@ import SwiftUI
 
 struct HomeView: View {
     
-    @ObservedObject var dataModel: ItemsDataModel
+    @EnvironmentObject var webViewState: WebViewState
+    
+    // TODO: move these to ListView (and rename to ItemCollectionView).
+    @State var topStories = ItemsDataModel(.topStories)
+    @State var newStories = ItemsDataModel(.newStories)
+    @State var askStories = ItemsDataModel(.askStories)
+    @State var showStories = ItemsDataModel(.showStories)
+    @State var jobStories = ItemsDataModel(.jobStories)
     
     var body: some View {
-        NavigationView {
-            // todo: try foreach per video
-            List(dataModel.items) {
-                ItemCellView(item: $0)
-            }.navigationBarTitle(Text("Top Stories"))
-                .padding([.leading, .trailing], -20)
-        }.onAppear {
-            UITableView.appearance().separatorColor = .clear
-            _ = DataProvider.shared.refreshDataModel(self.dataModel)
+        
+        TabView {
+            ListView(dataModel: topStories)
+                .tabItem {
+                    Image(systemName: "house")
+                    Text("Home")
+            }
+            
+            ListView(dataModel: newStories)
+                .tabItem {
+                    Image(systemName: "sparkles")
+                    Text("New")
+            }
+            
+            ListView(dataModel: askStories)
+                .tabItem {
+                    Image(systemName: "questionmark.square")
+                    Text("Ask")
+            }
+            
+            ListView(dataModel: showStories)
+                .tabItem {
+                    Image(systemName: "eye")
+                    Text("Show")
+            }
+            
+            ListView(dataModel: jobStories)
+                .tabItem {
+                    Image(systemName: "briefcase")
+                    Text("Jobs")
+            }
+        }.sheet(isPresented: $webViewState.isShowing, onDismiss: { self.webViewState.url = nil; }) {
+            WebViewContainer()
+                .environmentObject(self.webViewState)
         }
+    }
+}
+
+struct WebViewContainer: View {
+
+    @EnvironmentObject var webViewState: WebViewState
+    
+    var body: some View {
+        WebView(url: webViewState.url)
     }
 }
 
@@ -66,6 +107,6 @@ struct HomeView_Previews: PreviewProvider {
         topStories.items = items
         topStories.error = nil
         
-        return HomeView(dataModel: topStories)
+        return HomeView()
     }
 }

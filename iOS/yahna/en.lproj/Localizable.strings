@@ -1,0 +1,14 @@
+/* 
+  Localizable.strings
+  yahna
+
+  Created by Ernesto Badillo on 10/2/19.
+  Copyright © 2019 Ernesto Badillo. All rights reserved.
+*/
+
+"topStoriesViewTitle" = "Top Stories";
+"bestStoriesViewTitle" = "Best Stories";
+"newStoriesViewTitle" = "New Stories";
+"askStoriesViewTitle" = "Ask HN";
+"showStoriesViewTitle" = "Show HN";
+"jobStoriesViewTitle" = "Jobs";
