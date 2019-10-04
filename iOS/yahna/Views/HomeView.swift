@@ -12,7 +12,6 @@ struct HomeView: View {
     
     @EnvironmentObject var webViewState: WebViewState
     
-    // TODO: move these to ListView (and rename to ItemCollectionView).
     @State var topStories = ItemsDataModel(.topStories)
     @State var newStories = ItemsDataModel(.newStories)
     @State var askStories = ItemsDataModel(.askStories)
@@ -63,7 +62,10 @@ struct WebViewContainer: View {
     @EnvironmentObject var webViewState: WebViewState
     
     var body: some View {
-        WebView(url: webViewState.url)
+        VStack {
+            Text(verbatim: " ")
+            WebView(url: webViewState.url)
+        }
     }
 }
 

@@ -17,54 +17,72 @@ struct ItemCellView: View {
     var body: some View {
         VStack(alignment: .leading) {
             
-            HStack(spacing: 0) {
-                Text(verbatim: "@\(item.by ?? "")").foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
-                Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
-                Text(verbatim: item.time.toTimeString()).foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
-            }.padding([.leading, .trailing])
-                .fixedSize(horizontal: false, vertical: true)
+            header
             
+            textArea
+            
+            linkButton
+            
+            footer
+            
+            Divider()
+        }
+    }
+    
+    var header: some View {
+        HStack(spacing: 0) {
+            Text(verbatim: "@\(item.by ?? "")").foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
+            Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
+            Text(verbatim: item.time.toTimeString()).foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
+        }.padding([.leading, .trailing])
+            .fixedSize(horizontal: false, vertical: true)
+    }
+    
+    var textArea: some View {
+        NavigationLink(destination: ItemView(item: item)) {
             HStack {
                 Text(verbatim: item.title ?? "")
                     .font(.body)
                     .lineLimit(nil)
             }.padding(.horizontal)
-            
-            Button(action: {
-                if let urlString = self.item.url, let url = URL(string: urlString) {
-                    self.webViewState.url = url
-                    self.webViewState.isShowing = true
-                }
-            }) {
-                Text(verbatim: item.urlWithoutProtocol)
-                    .lineLimit(1)
-                    .foregroundColor(Color(UIColor.systemTeal))
-                    .font(.subheadline)
-                    .padding(.horizontal)
+        }.padding(.trailing, -20)
+    }
+    
+    var linkButton: some View {
+        Button(action: { }) {
+            Text(verbatim: item.urlWithoutProtocol)
+                .lineLimit(1)
+                .foregroundColor(Color(UIColor.systemBlue))
+                .font(.subheadline)
+                .padding(.horizontal)
+        }.onTapGesture {
+            if let urlString = self.item.url, let url = URL(string: urlString) {
+                self.webViewState.url = url
+                self.webViewState.isShowing = true
             }
-            
-            HStack(spacing:4) {
-                
-                Text(verbatim: "\(item.score ?? 0) points")
-                    .foregroundColor(Color(UIColor.systemGray))
-                    .font(.subheadline)
-                
-                Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
-                
-                Image(systemName: "bubble.left.and.bubble.right")
-                    .resizable()
-                    .frame(width: 19, height: 16, alignment: .center)
-                    .foregroundColor(Color(UIColor.systemGray))
-                
-                Text(verbatim: "\(item.descendantsCount ?? 0)")
-                    .foregroundColor(Color(UIColor.systemGray))
-                    .font(.subheadline)
-                
-            }.padding(.horizontal)
-            .fixedSize(horizontal: false, vertical: true)
-            
-            Divider()
         }
+    }
+    
+    var footer: some View {
+        HStack(spacing:4) {
+            
+            Text(verbatim: "\(item.score ?? 0) points")
+                .foregroundColor(Color(UIColor.systemGray))
+                .font(.subheadline)
+            
+            Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
+            
+            Image(systemName: "bubble.left.and.bubble.right")
+                .resizable()
+                .frame(width: 19, height: 16, alignment: .center)
+                .foregroundColor(Color(UIColor.systemGray))
+            
+            Text(verbatim: "\(item.descendantsCount ?? 0)")
+                .foregroundColor(Color(UIColor.systemGray))
+                .font(.subheadline)
+            
+        }.padding(.horizontal)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 

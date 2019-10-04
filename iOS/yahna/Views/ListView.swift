@@ -9,15 +9,12 @@
 import SwiftUI
 
 struct ListView: View {
-    @State var dataModel: ItemsDataModel
+    @ObservedObject var dataModel: ItemsDataModel
     
     var body: some View {
         NavigationView {
             List(dataModel.items) { (item) in
                 ItemCellView(item: item)
-//                NavigationLink(destination: ItemView(item: item)) {
-//                    ItemCellView(item: item, showingWebview: self.$showingWebview, webViewUrl: self.$webViewUrl)
-//                }.padding(.trailing, -20)
             }.navigationBarTitle(Text(dataModel.parentId.title ?? ""))
                 .padding(.horizontal, -20)
         }.onAppear {
