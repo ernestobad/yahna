@@ -21,31 +21,31 @@ struct HomeView: View {
     var body: some View {
         
         TabView {
-            ListView(dataModel: topStories)
+            ItemsView(dataModel: topStories)
                 .tabItem {
                     Image(systemName: "house")
                     Text("Home")
             }
             
-            ListView(dataModel: newStories)
+            ItemsView(dataModel: newStories)
                 .tabItem {
                     Image(systemName: "sparkles")
                     Text("New")
             }
             
-            ListView(dataModel: askStories)
+            ItemsView(dataModel: askStories)
                 .tabItem {
                     Image(systemName: "questionmark.square")
                     Text("Ask")
             }
             
-            ListView(dataModel: showStories)
+            ItemsView(dataModel: showStories)
                 .tabItem {
                     Image(systemName: "eye")
                     Text("Show")
             }
             
-            ListView(dataModel: jobStories)
+            ItemsView(dataModel: jobStories)
                 .tabItem {
                     Image(systemName: "briefcase")
                     Text("Jobs")

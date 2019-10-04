@@ -1,5 +1,5 @@
 //
-//  ListView.swift
+//  ItemsView.swift
 //  yahna
 //
 //  Created by Ernesto Badillo on 10/1/19.
@@ -8,7 +8,7 @@
 
 import SwiftUI
 
-struct ListView: View {
+struct ItemsView: View {
     @ObservedObject var dataModel: ItemsDataModel
     
     var body: some View {
@@ -26,7 +26,7 @@ struct ListView: View {
     }
 }
 
-struct ListView_Previews: PreviewProvider {
+struct ItemsView_Previews: PreviewProvider {
     
     static var previews: some View {
         
@@ -67,6 +67,6 @@ struct ListView_Previews: PreviewProvider {
         topStories.items = items
         topStories.error = nil
         
-        return ListView(dataModel: topStories)
+        return ItemsView(dataModel: topStories)
     }
 }
