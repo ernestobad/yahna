@@ -10,6 +10,7 @@ import Foundation
 
 import WebKit
 import SwiftUI
+import SafariServices
 
 struct WebView : UIViewRepresentable {
     
@@ -31,4 +32,14 @@ struct WebView : UIViewRepresentable {
 class WebViewState: ObservableObject {
     @Published var isShowing: Bool = false
     @Published var url: URL? = nil
+    
+    func show(url: URL) {
+        self.url = url
+        self.isShowing = true
+    }
+    
+    func hide() {
+        self.isShowing = false
+        self.url = nil
+    }
 }

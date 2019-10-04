@@ -5,3 +5,12 @@
   Created by Ernesto Badillo on 10/2/19.
   Copyright © 2019 Ernesto Badillo. All rights reserved.
 */
+
+"topStoriesViewTitle" = "Destacado";
+"bestStoriesViewTitle" = "Mejores";
+"newStoriesViewTitle" = "Nuevo";
+"askStoriesViewTitle" = "Pregunta a HN";
+"showStoriesViewTitle" = "Muestra a HN";
+"jobStoriesViewTitle" = "Trabajo";
+
+"closeWebViewButtonTitle" = "Cerrar";

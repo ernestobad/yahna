@@ -51,23 +51,13 @@ struct HomeView: View {
                     Text("Jobs")
             }
         }.sheet(isPresented: $webViewState.isShowing, onDismiss: { self.webViewState.url = nil; }) {
-            WebViewContainer()
+            WebViewContainerView()
                 .environmentObject(self.webViewState)
         }
     }
 }
 
-struct WebViewContainer: View {
 
-    @EnvironmentObject var webViewState: WebViewState
-    
-    var body: some View {
-        VStack {
-            Text(verbatim: " ")
-            WebView(url: webViewState.url)
-        }
-    }
-}
 
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {

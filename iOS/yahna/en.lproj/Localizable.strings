@@ -12,3 +12,5 @@
 "askStoriesViewTitle" = "Ask HN";
 "showStoriesViewTitle" = "Show HN";
 "jobStoriesViewTitle" = "Jobs";
+
+"closeWebViewButtonTitle" = "Done";

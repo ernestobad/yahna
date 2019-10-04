@@ -18,6 +18,8 @@ enum Strings: String {
     case showStoriesViewTitle
     case jobStoriesViewTitle
     
+    case closeWebViewButtonTitle
+    
     var localizedString: String {
         return NSLocalizedString(self.rawValue, comment: "")
     }

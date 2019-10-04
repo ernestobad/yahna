@@ -13,6 +13,7 @@
 		943FCD32232D13F50051B94C /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 943FCD31232D13F50051B94C /* Assets.xcassets */; };
 		943FCD35232D13F50051B94C /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 943FCD34232D13F50051B94C /* Preview Assets.xcassets */; };
 		943FCD38232D13F50051B94C /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 943FCD36232D13F50051B94C /* LaunchScreen.storyboard */; };
+		944AA834234783F100220BA8 /* WebViewContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944AA833234783F100220BA8 /* WebViewContainerView.swift */; };
 		9472051923463ABF00DF65F2 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9472051823463ABF00DF65F2 /* WebView.swift */; };
 		948B37CC2340F50E0062C229 /* JsonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37CB2340F50E0062C229 /* JsonItem.swift */; };
 		948B37CE234101ED0062C229 /* ParentId.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37CD234101ED0062C229 /* ParentId.swift */; };
@@ -21,7 +22,7 @@
 		948B37D72343D9060062C229 /* ListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37D62343D9060062C229 /* ListView.swift */; };
 		948B37D92343DDD30062C229 /* ItemsDataModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37D82343DDD30062C229 /* ItemsDataModel.swift */; };
 		948B37E12344CD6B0062C229 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 948B37E32344CD6B0062C229 /* Localizable.strings */; };
-		948B37E62344D1A20062C229 /* LocalizedStringKey.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37E52344D1A20062C229 /* LocalizedStringKey.swift */; };
+		948B37E62344D1A20062C229 /* Strings.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37E52344D1A20062C229 /* Strings.swift */; };
 		948B37E82345076C0062C229 /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37E72345076C0062C229 /* ItemView.swift */; };
 		94E100F52332B0D700721E4D /* DatabaseManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 94E100F42332B0D700721E4D /* DatabaseManager.swift */; };
 		94E100F82332BF3D00721E4D /* SQLite.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 94E100F72332BF3D00721E4D /* SQLite.framework */; };
@@ -43,6 +44,7 @@
 		943FCD37232D13F50051B94C /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		943FCD39232D13F50051B94C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		943FCD3F232D14C60051B94C /* yahna.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = yahna.entitlements; sourceTree = "<group>"; };
+		944AA833234783F100220BA8 /* WebViewContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewContainerView.swift; sourceTree = "<group>"; };
 		9472051823463ABF00DF65F2 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		948B37CB2340F50E0062C229 /* JsonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonItem.swift; sourceTree = "<group>"; };
 		948B37CD234101ED0062C229 /* ParentId.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ParentId.swift; sourceTree = "<group>"; };
@@ -52,7 +54,7 @@
 		948B37D82343DDD30062C229 /* ItemsDataModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemsDataModel.swift; sourceTree = "<group>"; };
 		948B37E22344CD6B0062C229 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
 		948B37E42344CE130062C229 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
-		948B37E52344D1A20062C229 /* LocalizedStringKey.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizedStringKey.swift; sourceTree = "<group>"; };
+		948B37E52344D1A20062C229 /* Strings.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Strings.swift; sourceTree = "<group>"; };
 		948B37E72345076C0062C229 /* ItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemView.swift; sourceTree = "<group>"; };
 		94E100F42332B0D700721E4D /* DatabaseManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DatabaseManager.swift; sourceTree = "<group>"; };
 		94E100F72332BF3D00721E4D /* SQLite.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SQLite.framework; path = yahna/Carthage/Build/iOS/SQLite.framework; sourceTree = "<group>"; };
@@ -139,7 +141,7 @@
 				948B37CB2340F50E0062C229 /* JsonItem.swift */,
 				948B37CD234101ED0062C229 /* ParentId.swift */,
 				948B37D82343DDD30062C229 /* ItemsDataModel.swift */,
-				948B37E52344D1A20062C229 /* LocalizedStringKey.swift */,
+				948B37E52344D1A20062C229 /* Strings.swift */,
 			);
 			path = Core;
 			sourceTree = "<group>";
@@ -160,6 +162,7 @@
 				948B37D62343D9060062C229 /* ListView.swift */,
 				948B37E72345076C0062C229 /* ItemView.swift */,
 				9472051823463ABF00DF65F2 /* WebView.swift */,
+				944AA833234783F100220BA8 /* WebViewContainerView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -269,6 +272,7 @@
 			files = (
 				948B37CE234101ED0062C229 /* ParentId.swift in Sources */,
 				948B37D92343DDD30062C229 /* ItemsDataModel.swift in Sources */,
+				944AA834234783F100220BA8 /* WebViewContainerView.swift in Sources */,
 				943FCD2C232D13F30051B94C /* AppDelegate.swift in Sources */,
 				94E101062333D63700721E4D /* ArrayExtensions.swift in Sources */,
 				948B37D2234167FD0062C229 /* ItemCellView.swift in Sources */,
@@ -277,7 +281,7 @@
 				94E100FD2332E51300721E4D /* Item.swift in Sources */,
 				943FCD2E232D13F30051B94C /* SceneDelegate.swift in Sources */,
 				948B37CC2340F50E0062C229 /* JsonItem.swift in Sources */,
-				948B37E62344D1A20062C229 /* LocalizedStringKey.swift in Sources */,
+				948B37E62344D1A20062C229 /* Strings.swift in Sources */,
 				94E101042333D1EE00721E4D /* NetworkDataProvider.swift in Sources */,
 				948B37D72343D9060062C229 /* ListView.swift in Sources */,
 				943FCD30232D13F30051B94C /* HomeView.swift in Sources */,
