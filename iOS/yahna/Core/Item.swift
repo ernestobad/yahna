@@ -31,6 +31,12 @@ struct Item : Identifiable {
     let score: Int64?
     let title: String?
     
+    var partsIds = [Int64]()
+    var kidsIds = [Int64]()
+    
+    var parts = [Item]()
+    var kids = [Item]()
+    
     let descendantsCount: Int64?
     
     init(id: Int64,
@@ -80,6 +86,8 @@ struct Item : Identifiable {
         score = jsonItem.score
         title = jsonItem.title
         descendantsCount = jsonItem.descendants
+        partsIds = jsonItem.parts ?? [Int64]()
+        kidsIds = jsonItem.kids ?? [Int64]()
     }
     
     var domain: String {

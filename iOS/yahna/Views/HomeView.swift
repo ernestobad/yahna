@@ -12,40 +12,40 @@ struct HomeView: View {
     
     @EnvironmentObject var webViewState: WebViewState
     
-    @State var topStories = ItemsDataModel(.topStories)
-    @State var newStories = ItemsDataModel(.newStories)
-    @State var askStories = ItemsDataModel(.askStories)
-    @State var showStories = ItemsDataModel(.showStories)
-    @State var jobStories = ItemsDataModel(.jobStories)
+    @State var topStories = ItemsViewModel(.topStories)
+    @State var newStories = ItemsViewModel(.newStories)
+    @State var askStories = ItemsViewModel(.askStories)
+    @State var showStories = ItemsViewModel(.showStories)
+    @State var jobStories = ItemsViewModel(.jobStories)
     
     var body: some View {
         
         TabView {
-            ItemsView(dataModel: topStories)
+            ItemsView(viewModel: topStories)
                 .tabItem {
                     Image(systemName: "house")
                     Text("Home")
             }
             
-            ItemsView(dataModel: newStories)
+            ItemsView(viewModel: newStories)
                 .tabItem {
                     Image(systemName: "sparkles")
                     Text("New")
             }
             
-            ItemsView(dataModel: askStories)
+            ItemsView(viewModel: askStories)
                 .tabItem {
                     Image(systemName: "questionmark.square")
                     Text("Ask")
             }
             
-            ItemsView(dataModel: showStories)
+            ItemsView(viewModel: showStories)
                 .tabItem {
                     Image(systemName: "eye")
                     Text("Show")
             }
             
-            ItemsView(dataModel: jobStories)
+            ItemsView(viewModel: jobStories)
                 .tabItem {
                     Image(systemName: "briefcase")
                     Text("Jobs")
@@ -91,9 +91,8 @@ struct HomeView_Previews: PreviewProvider {
                           title: "test2",
                           descendantsCount: 0))
         
-        let topStories = ItemsDataModel(.topStories)
+        let topStories = ItemsViewModel(.topStories)
         topStories.items = items
-        topStories.error = nil
         
         return HomeView()
     }

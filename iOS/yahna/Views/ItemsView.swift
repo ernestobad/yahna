@@ -7,21 +7,22 @@
 //
 
 import SwiftUI
+import Combine
 
 struct ItemsView: View {
-    @ObservedObject var dataModel: ItemsDataModel
+    @ObservedObject var viewModel: ItemsViewModel
     
     var body: some View {
         NavigationView {
-            StatesView(dataModel: dataModel) {
-                List(self.dataModel.items) { (item) in
+            StatesView(viewModel: viewModel) {
+                List(self.viewModel.items) { (item) in
                     ItemCellView(item: item)
-                }.navigationBarTitle(Text(self.dataModel.parentId.title ?? ""))
+                }.navigationBarTitle(Text(self.viewModel.parentId.title ?? ""))
                     .padding(.horizontal, -20)
             }
         }.onAppear {
             UITableView.appearance().separatorColor = .clear
-            _ = DataProvider.shared.refreshDataModel(self.dataModel)
+            DataProvider.shared.refreshViewModel(self.viewModel)
         }
     }
 }
@@ -59,10 +60,9 @@ struct ItemsView_Previews: PreviewProvider {
                           title: "test2",
                           descendantsCount: 0))
         
-        let topStories = ItemsDataModel(.topStories)
+        let topStories = ItemsViewModel(.topStories)
         topStories.items = items
-        topStories.error = nil
         
-        return ItemsView(dataModel: topStories)
+        return ItemsView(viewModel: topStories)
     }
 }

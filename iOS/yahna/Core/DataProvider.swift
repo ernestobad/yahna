@@ -17,15 +17,16 @@ class DataProvider {
     
     public static let shared = DataProvider()
     
-    public func refreshDataModel(_ dataModel: ItemsDataModel) -> AnyCancellable {
+    @discardableResult
+    public func refreshViewModel<T : RefreshableViewModel>(_ viewModel: T) -> Cancellable {
         
-        DispatchQueue.main.async { dataModel.isRefreshing = true }
+        DispatchQueue.main.async { viewModel.onRefreshStarted() }
         
         let combinedPublisher: AnyPublisher<(Item?, [Item]), Error>
                 
         let parentPublisher: AnyPublisher<Item?, Error>
         
-        if case let ParentId.item(id: id) = dataModel.parentId {
+        if case let ParentId.item(id: id) = viewModel.parentId {
             parentPublisher = NetworkDataProvider.shared.getItem(id: id)
                 .tryMap { (jsonItem) -> Item? in
                     guard let item = Item(jsonItem: jsonItem) else { throw DataProviderError.invalidItem }
@@ -35,7 +36,7 @@ class DataProvider {
             parentPublisher = Just(nil as Item?).tryMap({ $0 }).eraseToAnyPublisher()
         }
         
-        let itemsPublisher = NetworkDataProvider.shared.getItems(dataModel.parentId)
+        let itemsPublisher = NetworkDataProvider.shared.getItems(viewModel.parentId)
             .tryMap({ (jsonItems) -> [Item] in jsonItems.compactMap { (jsonItem) in Item(jsonItem: jsonItem) } })
             .eraseToAnyPublisher()
         
@@ -43,57 +44,39 @@ class DataProvider {
             .combineLatest(itemsPublisher)
             .eraseToAnyPublisher()
         
+        var result: [Item]?
+        
         return combinedPublisher
+            .map({ (parent, items) -> [Item] in
+                if let parent = parent {
+                    var idToItemMap = [Int64: Item]()
+                    idToItemMap[parent.id] = parent
+                    items.forEach { idToItemMap[$0.id] = $0 }
+                    var queue = [Item]()
+                    queue.append(parent)
+                    while var item = queue.popLast() {
+                        for itemId in item.kidsIds {
+                            if let kid = idToItemMap[itemId] {
+                                item.kids.append(kid)
+                                queue.append(kid)
+                            }
+                        }
+                    }
+                    return [parent]
+                } else {
+                    return items
+                }
+            })
             .receive(on: RunLoop.main)
             .sink(receiveCompletion: { completion in
                 switch completion {
                 case .finished:
-                    dataModel.error = nil
+                    viewModel.onRefreshCompleted(result, error: nil)
                 case .failure(let anError):
-                    dataModel.error = anError
+                    viewModel.onRefreshCompleted(result, error: anError)
                 }
-                dataModel.isRefreshing = false
-            }, receiveValue: { (parent, items) in
-                dataModel.parentItem = parent
-                dataModel.items = items
+            }, receiveValue: { refreshResult in
+                result = refreshResult
             })
-    }
-    
-    private func getItems(ids: [Int64]) -> AnyPublisher<[Item], Error> {
-        Just(ids)
-            .receive(on: DispatchQueue.global())
-            .tryMap { (ids) -> [Int64: Item] in try DatabaseManager.shared.get(ids: ids) }
-            .flatMap { mapFromDb -> AnyPublisher<[Item], Error> in
-                
-                let missingIds = ids.filter { mapFromDb[$0] == nil }
-                
-                return Publishers.Sequence<[Int64], Error>(sequence: missingIds)
-                    .flatMap { (id) -> AnyPublisher<JsonItem, Error> in NetworkDataProvider.shared.getItem(id: id) }
-                    .tryMap({ (jsonItem) throws -> Item in
-                        guard let item = Item(jsonItem: jsonItem) else {
-                            throw DataProviderError.invalidItem
-                        }
-                        try? DatabaseManager.shared.save(item: item)
-                        return item
-                    })
-                    .collect()
-                    .map { (networkItems) -> [Item] in
-                        
-                        var mapFromNetwork = [Int64:Item]()
-                        networkItems.forEach { mapFromNetwork[$0.id] = $0 }
-                        
-                        var result = [Item]()
-                        for id in ids {
-                            if let item = mapFromNetwork[id] {
-                                result.append(item)
-                            } else if let item = mapFromDb[id] {
-                                result.append(item)
-                            }
-                        }
-                        return result
-                }
-                .eraseToAnyPublisher()
-                
-        }.eraseToAnyPublisher()
     }
 }
