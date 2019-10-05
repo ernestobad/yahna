@@ -40,14 +40,8 @@ class DatabaseManager {
     // The comment's parent: either another comment or the relevant story.
     private let parentCol = Expression<Int64?>("parent")
     
-    // the order this item appears in the parent's kids list
-    private let childOrderCol = Expression<Int64?>("child_order")
-    
     // The pollopt's associated poll.
     private let pollCol = Expression<Int64?>("poll")
-    
-    // The order this poll option appears in the poll's parts list.s
-    private let pollOptionOrderCol = Expression<Int64?>("pollopt_order")
     
     // The URL of the story.
     private let urlCol = Expression<String?>("url")
@@ -110,9 +104,7 @@ class DatabaseManager {
             t.column(textCol)
             t.column(deadCol)
             t.column(parentCol)
-            t.column(childOrderCol)
             t.column(pollCol)
-            t.column(pollOptionOrderCol)
             t.column(urlCol)
             t.column(scoreCol)
             t.column(titleCol)
@@ -121,9 +113,6 @@ class DatabaseManager {
             t.foreignKey(parentCol, references: itemsTable, idCol)
             t.foreignKey(pollCol, references: itemsTable, idCol)
         })
-        
-        try db.run(itemsTable.createIndex(parentCol, childOrderCol, unique: false, ifNotExists: true))
-        try db.run(itemsTable.createIndex(pollCol, pollOptionOrderCol, unique: false, ifNotExists: true))
     }
     
     func save(item: Item) throws {
@@ -188,9 +177,7 @@ class DatabaseManager {
                     text: row[textCol],
                     dead: row[deadCol],
                     parent: row[parentCol],
-                    childOrder: row[childOrderCol],
                     poll: row[pollCol],
-                    pollOptionOrder: row[pollOptionOrderCol],
                     url: row[urlCol],
                     score: row[scoreCol],
                     title: row[titleCol],

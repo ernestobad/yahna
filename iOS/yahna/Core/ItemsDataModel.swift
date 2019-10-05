@@ -16,7 +16,7 @@ class ItemsDataModel : ObservableObject {
     
     @Published var isRefreshing: Bool = false
     
-    @Published var items: [Item] = [Item]()
+    @Published var items: [Item] = [Item]() // todo: Item.children so we can have a comment hierarchy
     
     @Published var parentItem: Item?
     
@@ -32,22 +32,5 @@ class ItemsDataModel : ObservableObject {
         self.parentId = ParentId.item(id: parentItem.id)
         self.parentItem = parentItem
         self.title = title
-    }
-}
-
-class ItemDataModel : ObservableObject {
-    
-    @Published var item: Item
-    
-    @Published var isRefreshing: Bool = false
-    
-    @Published var parentItem: Item?
-    
-    @Published var error: Error?
-    
-    @Published var children = [Item]()
-    
-    init(_ item: Item) {
-        self.item = item
     }
 }

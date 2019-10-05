@@ -24,10 +24,6 @@ struct ItemsView: View {
             _ = DataProvider.shared.refreshDataModel(self.dataModel)
         }
     }
-    
-    var emptyView: some View {
-        LoadingView()
-    }
 }
 
 struct ItemsView_Previews: PreviewProvider {
@@ -43,9 +39,7 @@ struct ItemsView_Previews: PreviewProvider {
                           text: "test test 1",
                           dead: false,
                           parent: nil,
-                          childOrder: 1,
                           poll: nil,
-                          pollOptionOrder: nil,
                           url: "https://www.reuters.com/article/us-wework-ipo/wework-says-will-file-to-withdraw-ipo-idUSKBN1WF1NS",
                           score: 312,
                           title: "WeWork says will file to withdraw IPO, WeWork says will file to withdraw IPO, WeWork says will file to withdraw IPO, WeWork says will file to withdraw IPO",
@@ -59,9 +53,7 @@ struct ItemsView_Previews: PreviewProvider {
                           text: "test test 2",
                           dead: false,
                           parent: nil,
-                          childOrder: 1,
                           poll: nil,
-                          pollOptionOrder: nil,
                           url: "https://www.reuters.com/article/us-wework-ipo/wework-says-will-file-to-withdraw-ipo-idUSKBN1WF1N",
                           score: 100,
                           title: "test2",

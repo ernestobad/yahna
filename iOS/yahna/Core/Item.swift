@@ -26,9 +26,7 @@ struct Item : Identifiable {
     let text: String?
     let dead: Bool
     let parent: Int64?
-    let childOrder: Int64?
     let poll: Int64?
-    let pollOptionOrder: Int64?
     let url: String?
     let score: Int64?
     let title: String?
@@ -43,9 +41,7 @@ struct Item : Identifiable {
          text: String?,
          dead: Bool,
          parent: Int64?,
-         childOrder: Int64?,
          poll: Int64?,
-         pollOptionOrder: Int64?,
          url: String?,
          score: Int64?,
          title: String?,
@@ -58,9 +54,7 @@ struct Item : Identifiable {
         self.text = text
         self.dead = dead
         self.parent = parent
-        self.childOrder = childOrder
         self.poll = poll
-        self.pollOptionOrder = pollOptionOrder
         self.url = url
         self.score = score
         self.title = title
@@ -86,8 +80,6 @@ struct Item : Identifiable {
         score = jsonItem.score
         title = jsonItem.title
         descendantsCount = jsonItem.descendants
-        childOrder = nil
-        pollOptionOrder = nil
     }
     
     var domain: String {
