@@ -20,6 +20,9 @@ enum Strings: String {
     
     case closeWebViewButtonTitle
     
+    case errorMessage
+    case emptyViewMessage
+    
     var localizedString: String {
         return NSLocalizedString(self.rawValue, comment: "")
     }

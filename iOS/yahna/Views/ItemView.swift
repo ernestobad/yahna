@@ -10,55 +10,84 @@ import SwiftUI
 
 struct ItemView: View {
     
+    @EnvironmentObject var webViewState: WebViewState
+    
     var item: Item
     
     var body: some View {
-        VStack(alignment: .leading) {
+        ScrollView(.vertical, showsIndicators: true) {
             
-            HStack(spacing: 0) {
-                Text(verbatim: "@\(item.by ?? "")").foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
-                Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
-                Text(verbatim: item.time.toTimeString()).foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
-                Spacer()
-                Text(verbatim: item.domain ).foregroundColor(Color(UIColor.systemTeal)).font(.subheadline)
-            }.padding([.leading, .trailing])
-                .fixedSize()
+            VStack(alignment: .leading) {
+                header
+                textArea
+                linkButton
+                footer
+                Divider()
+            }
             
-            HStack {
-                Text(verbatim: item.title ?? "")
-                    .font(.body)
-                    .lineLimit(nil)
-            }.padding([.leading, .trailing])
+            ForEach(0..<100) { i in
+                Text("Item \(i)")
+                Divider()
+            }
             
-            HStack(spacing:4) {
-                
-                Image(systemName: "arrow.up")
-                    .resizable()
-                    .frame(width: 14, height: 14, alignment: .center)
-                    .foregroundColor(Color(UIColor.systemGray))
-                
-                Text(verbatim: "\(item.score ?? 0)")
-                    .foregroundColor(Color(UIColor.systemGray))
-                    .font(.subheadline)
-                
-                Spacer()
-                    .fixedSize()
-                    .frame(width: 20, height: 16, alignment: .center)
-                
-                Image(systemName: "bubble.left.and.bubble.right")
-                    .resizable()
-                    .frame(width: 19, height: 16, alignment: .center)
-                    .foregroundColor(Color(UIColor.systemGray))
-                
-                Text(verbatim: "\(item.descendantsCount ?? 0)")
-                    .foregroundColor(Color(UIColor.systemGray))
-                    .font(.subheadline)
-                
-                }.padding([.leading, .trailing])
-            .fixedSize()
-            Divider()
-            Spacer()
+        }.padding(.top, 50)
+            .edgesIgnoringSafeArea(.top)
+        
+    }
+    
+    var header: some View {
+        HStack(spacing: 0) {
+            Text(verbatim: "@\(item.by ?? "")").foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
+            Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
+            Text(verbatim: item.time.toTimeString()).foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
+        }.padding([.leading, .trailing])
+            .fixedSize(horizontal: false, vertical: true)
+    }
+    
+    var textArea: some View {
+        HStack {
+            Text(verbatim: item.title ?? "")
+                .font(.body)
+                .lineLimit(nil)
+        }.padding(.horizontal)
+    }
+    
+    var linkButton: some View {
+        Button(action: {
+            if let urlString = self.item.url, let url = URL(string: urlString) {
+                           self.webViewState.url = url
+                           self.webViewState.isShowing = true
+                       }
+            
+        }) {
+            Text(verbatim: item.urlWithoutProtocol)
+                .lineLimit(1)
+                .foregroundColor(Color(UIColor.systemBlue))
+                .font(.subheadline)
+                .padding(.horizontal)
         }
+    }
+    
+    var footer: some View {
+        HStack(spacing:4) {
+            
+            Text(verbatim: "\(item.score ?? 0) points")
+                .foregroundColor(Color(UIColor.systemGray))
+                .font(.subheadline)
+            
+            Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
+            
+            Image(systemName: "bubble.left.and.bubble.right")
+                .resizable()
+                .frame(width: 19, height: 16, alignment: .center)
+                .foregroundColor(Color(UIColor.systemGray))
+            
+            Text(verbatim: "\(item.descendantsCount ?? 0)")
+                .foregroundColor(Color(UIColor.systemGray))
+                .font(.subheadline)
+            
+        }.padding(.horizontal)
+        .fixedSize(horizontal: false, vertical: true)
     }
 }
 

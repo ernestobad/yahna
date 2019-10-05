@@ -16,6 +16,10 @@ struct WebView : UIViewRepresentable {
     
     var url: URL?
 
+    func makeCoordinator() -> Coordinator {
+        Coordinator()
+    }
+    
     func makeUIView(context: Context) -> WKWebView  {
         return WKWebView()
     }
@@ -23,8 +27,23 @@ struct WebView : UIViewRepresentable {
     func updateUIView(_ webView: WKWebView, context: Context) {
         if let url = url {
             webView.load(URLRequest(url: url))
+            webView.navigationDelegate = context.coordinator
         } else {
             webView.loadHTMLString("<html><body><p></p></body></html>", baseURL: nil)
+        }
+    }
+    
+    class Coordinator : NSObject, WKNavigationDelegate {
+        func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+            print("--- Navigation success")
+        }
+        
+        func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+            print("--- Navigation failed with error: \(error)")
+        }
+        
+        func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
+             print("--- Provisional Navigation failed with error: \(error)")
         }
     }
 }

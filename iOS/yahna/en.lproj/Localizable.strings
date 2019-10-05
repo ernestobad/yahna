@@ -14,3 +14,6 @@
 "jobStoriesViewTitle" = "Jobs";
 
 "closeWebViewButtonTitle" = "Done";
+
+"errorMessage" = "Please verify your network connection";
+"emptyViewMessage" = "There are no stories here yet";

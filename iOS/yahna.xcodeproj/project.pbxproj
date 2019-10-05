@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		942B72D12347F9000049EF5D /* ActivityIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942B72D02347F9000049EF5D /* ActivityIndicatorView.swift */; };
+		942B72D32348DA570049EF5D /* StatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942B72D22348DA570049EF5D /* StatesView.swift */; };
 		943FCD2C232D13F30051B94C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943FCD2B232D13F30051B94C /* AppDelegate.swift */; };
 		943FCD2E232D13F30051B94C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943FCD2D232D13F30051B94C /* SceneDelegate.swift */; };
 		943FCD30232D13F30051B94C /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 943FCD2F232D13F30051B94C /* HomeView.swift */; };
@@ -35,6 +37,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		942B72D02347F9000049EF5D /* ActivityIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorView.swift; sourceTree = "<group>"; };
+		942B72D22348DA570049EF5D /* StatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatesView.swift; sourceTree = "<group>"; };
 		943FCD28232D13F30051B94C /* yahna.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = yahna.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		943FCD2B232D13F30051B94C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		943FCD2D232D13F30051B94C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -163,6 +167,8 @@
 				948B37E72345076C0062C229 /* ItemView.swift */,
 				9472051823463ABF00DF65F2 /* WebView.swift */,
 				944AA833234783F100220BA8 /* WebViewContainerView.swift */,
+				942B72D02347F9000049EF5D /* ActivityIndicatorView.swift */,
+				942B72D22348DA570049EF5D /* StatesView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -272,6 +278,7 @@
 			files = (
 				948B37CE234101ED0062C229 /* ParentId.swift in Sources */,
 				948B37D92343DDD30062C229 /* ItemsDataModel.swift in Sources */,
+				942B72D32348DA570049EF5D /* StatesView.swift in Sources */,
 				944AA834234783F100220BA8 /* WebViewContainerView.swift in Sources */,
 				943FCD2C232D13F30051B94C /* AppDelegate.swift in Sources */,
 				94E101062333D63700721E4D /* ArrayExtensions.swift in Sources */,
@@ -284,6 +291,7 @@
 				948B37E62344D1A20062C229 /* Strings.swift in Sources */,
 				94E101042333D1EE00721E4D /* NetworkDataProvider.swift in Sources */,
 				948B37D72343D9060062C229 /* ItemsView.swift in Sources */,
+				942B72D12347F9000049EF5D /* ActivityIndicatorView.swift in Sources */,
 				943FCD30232D13F30051B94C /* HomeView.swift in Sources */,
 				948B37E82345076C0062C229 /* ItemView.swift in Sources */,
 				9472051923463ABF00DF65F2 /* WebView.swift in Sources */,

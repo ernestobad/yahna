@@ -13,16 +13,20 @@ struct ItemsView: View {
     
     var body: some View {
         NavigationView {
-            List(dataModel.items) { (item) in
-                ItemCellView(item: item)
-            }.navigationBarTitle(Text(dataModel.parentId.title ?? ""))
-                .padding(.horizontal, -20)
+            StatesView(dataModel: dataModel) {
+                List(self.dataModel.items) { (item) in
+                    ItemCellView(item: item)
+                }.navigationBarTitle(Text(self.dataModel.parentId.title ?? ""))
+                    .padding(.horizontal, -20)
+            }
         }.onAppear {
             UITableView.appearance().separatorColor = .clear
             _ = DataProvider.shared.refreshDataModel(self.dataModel)
-        }.onDisappear() {
-            
         }
+    }
+    
+    var emptyView: some View {
+        LoadingView()
     }
 }
 

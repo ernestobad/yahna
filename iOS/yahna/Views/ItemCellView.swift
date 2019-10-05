@@ -34,7 +34,7 @@ struct ItemCellView: View {
             Text(verbatim: "@\(item.by ?? "")").foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
             Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
             Text(verbatim: item.time.toTimeString()).foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
-        }.padding([.leading, .trailing])
+        }.padding(.horizontal)
             .fixedSize(horizontal: false, vertical: true)
     }
     
