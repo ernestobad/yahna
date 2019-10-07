@@ -16,7 +16,7 @@ enum ItemType: String {
     case pollopt
 }
 
-struct Item : Identifiable {
+class Item : Identifiable {
     
     let id: Int64
     let deleted: Bool
@@ -24,6 +24,7 @@ struct Item : Identifiable {
     let by: String?
     let time: Date
     let text: String?
+    let attributedText: NSAttributedString?
     let dead: Bool
     let parent: Int64?
     let poll: Int64?
@@ -58,6 +59,7 @@ struct Item : Identifiable {
         self.by = by
         self.time = time
         self.text = text
+        self.attributedText = text?.attributedStringFromHtmlEncodedString()
         self.dead = dead
         self.parent = parent
         self.poll = poll
@@ -79,12 +81,13 @@ struct Item : Identifiable {
         by = jsonItem.by
         time = Date.init(timeIntervalSince1970: TimeInterval(jsonItem.time ?? 0))
         text = jsonItem.text
+        attributedText = jsonItem.text?.attributedStringFromHtmlEncodedString()
         dead = jsonItem.dead ?? false
         parent = jsonItem.parent
         poll = jsonItem.poll
         url = jsonItem.url
         score = jsonItem.score
-        title = jsonItem.title
+        title = jsonItem.title?.attributedStringFromHtmlEncodedString()?.string
         descendantsCount = jsonItem.descendants
         partsIds = jsonItem.parts ?? [Int64]()
         kidsIds = jsonItem.kids ?? [Int64]()

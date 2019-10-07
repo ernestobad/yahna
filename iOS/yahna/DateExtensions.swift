@@ -8,7 +8,7 @@
 
 import Foundation
 
-public extension Date {
+extension Date {
     
     private static let oneMinute = TimeInterval(60)
     private static let oneHour = TimeInterval(60*60)

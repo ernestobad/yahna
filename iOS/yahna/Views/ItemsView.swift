@@ -17,7 +17,7 @@ struct ItemsView: View {
             StatesView(viewModel: viewModel) {
                 List(self.viewModel.items) { (item) in
                     ItemCellView(item: item)
-                }.navigationBarTitle(Text(self.viewModel.parentId.title ?? ""))
+                }.navigationBarTitle(Text(self.viewModel.parentId.title ?? "").font(Fonts.largeTitle.font))
                     .padding(.horizontal, -20)
             }
         }.onAppear {
@@ -64,5 +64,6 @@ struct ItemsView_Previews: PreviewProvider {
         topStories.items = items
         
         return ItemsView(viewModel: topStories)
+            .environmentObject(WebViewState())
     }
 }

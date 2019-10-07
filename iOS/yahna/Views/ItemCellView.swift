@@ -16,44 +16,45 @@ struct ItemCellView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            
-            header
-            
-            textArea
-            
-            linkButton
-            
-            footer
-            
+            bySection
+            titleSection
+            linkSection
+            footerSection
             Divider()
         }
     }
     
-    var header: some View {
+    var bySection: some View {
         HStack(spacing: 0) {
-            Text(verbatim: "@\(item.by ?? "")").foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
-            Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
-            Text(verbatim: item.time.toTimeString()).foregroundColor(Color(UIColor.systemGray)).font(.subheadline)
+            Text(verbatim: "@\(item.by ?? "")")
+                .foregroundColor(Color(UIColor.systemGray))
+                .font(Fonts.caption.font)
+            Text(verbatim: "・")
+                .foregroundColor(Color(UIColor.systemGray))
+                .font(Fonts.caption.font)
+            Text(verbatim: item.time.toTimeString())
+                .foregroundColor(Color(UIColor.systemGray))
+                .font(Fonts.caption.font)
         }.padding(.horizontal)
             .fixedSize(horizontal: false, vertical: true)
     }
     
-    var textArea: some View {
-        NavigationLink(destination: ItemView(item: item)) {
+    var titleSection: some View {
+        NavigationLink(destination: ItemView(viewModel: ItemViewModel(item))) {
             HStack {
                 Text(verbatim: item.title ?? "")
-                    .font(.body)
+                    .font(Fonts.body.font)
                     .lineLimit(nil)
             }.padding(.horizontal)
         }.padding(.trailing, -20)
     }
     
-    var linkButton: some View {
+    var linkSection: some View {
         Button(action: { }) {
             Text(verbatim: item.urlWithoutProtocol)
                 .lineLimit(1)
                 .foregroundColor(Color(UIColor.systemBlue))
-                .font(.subheadline)
+                .font(Fonts.body.font)
                 .padding(.horizontal)
         }.onTapGesture {
             if let urlString = self.item.url, let url = URL(string: urlString) {
@@ -63,14 +64,16 @@ struct ItemCellView: View {
         }
     }
     
-    var footer: some View {
+    var footerSection: some View {
         HStack(spacing:4) {
             
             Text(verbatim: "\(item.score ?? 0) points")
                 .foregroundColor(Color(UIColor.systemGray))
-                .font(.subheadline)
+                .font(Fonts.caption.font)
             
-            Text(verbatim: "・").foregroundColor(Color(UIColor.systemGray2)).font(.subheadline)
+            Text(verbatim: "・")
+                .foregroundColor(Color(UIColor.systemGray2))
+                .font(Fonts.caption.font)
             
             Image(systemName: "bubble.left.and.bubble.right")
                 .resizable()
@@ -79,7 +82,7 @@ struct ItemCellView: View {
             
             Text(verbatim: "\(item.descendantsCount ?? 0)")
                 .foregroundColor(Color(UIColor.systemGray))
-                .font(.subheadline)
+                .font(Fonts.caption.font)
             
         }.padding(.horizontal)
         .fixedSize(horizontal: false, vertical: true)
@@ -105,6 +108,7 @@ struct ItemCellView_Previews: PreviewProvider {
                         descendantsCount: 30)
         
         let itemCellView = ItemCellView(item: item)
+        .environmentObject(WebViewState())
         
         return Group {
             itemCellView.environment(\.colorScheme, .light)

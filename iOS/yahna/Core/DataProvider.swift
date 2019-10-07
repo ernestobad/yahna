@@ -52,14 +52,12 @@ class DataProvider {
                     var idToItemMap = [Int64: Item]()
                     idToItemMap[parent.id] = parent
                     items.forEach { idToItemMap[$0.id] = $0 }
-                    var queue = [Item]()
-                    queue.append(parent)
-                    while var item = queue.popLast() {
-                        for itemId in item.kidsIds {
-                            if let kid = idToItemMap[itemId] {
-                                item.kids.append(kid)
-                                queue.append(kid)
-                            }
+                    idToItemMap.values.sorted(by: { $0.id < $1.id }).forEach {
+                        if $0.text?.contains("earning 300k") ?? false {
+                            print("found")
+                        }
+                        if let parentId = $0.parent, let parent = idToItemMap[parentId] {
+                            parent.kids.append($0)
                         }
                     }
                     return [parent]

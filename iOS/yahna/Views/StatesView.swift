@@ -8,26 +8,26 @@
 
 import SwiftUI
 
-struct StatesView<Content>: View where Content : View {
+struct StatesView<Content, ViewModel>: View where Content : View, ViewModel : RefreshableViewModel {
 
-    var viewModel: ItemsViewModel
+    var viewModel: ViewModel
     
     var content: () -> Content
     
     var shouldShowEmptyView: Bool {
-        viewModel.items.isEmpty && !viewModel.state.isRefreshing && viewModel.state.error == nil
+        viewModel.isEmpty && !viewModel.state.isRefreshing && viewModel.state.error == nil
     }
     
     var shouldShowErrorView: Bool {
-        viewModel.items.isEmpty && !viewModel.state.isRefreshing && viewModel.state.error != nil
+        viewModel.isEmpty && !viewModel.state.isRefreshing && viewModel.state.error != nil
     }
     
     var shouldShowLoadingView: Bool {
-        viewModel.items.isEmpty && viewModel.state.isRefreshing
+        viewModel.isEmpty && viewModel.state.isRefreshing
     }
     
     var shouldShowContent: Bool {
-        !viewModel.items.isEmpty
+        !viewModel.isEmpty
     }
     
     var body: some View {

@@ -21,6 +21,8 @@ protocol RefreshableViewModel : ObservableObject {
     
     var state: ViewState { get }
     
+    var isEmpty: Bool { get }
+    
     func onRefreshStarted()
     
     func onRefreshCompleted(_ result: [Item]?, error: Error?)
@@ -31,6 +33,8 @@ class RefreshableViewModelBase : RefreshableViewModel {
     let parentId: ParentId
     
     @Published var state: ViewState = ViewState(isRefreshing: false, error: nil)
+    
+    var isEmpty: Bool { return true }
     
     init(_ parentId: ParentId) {
         self.parentId = parentId
@@ -49,6 +53,8 @@ class ItemsViewModel : RefreshableViewModelBase {
     
     @Published var items: [Item] = [Item]()
     
+    override var isEmpty: Bool { items.isEmpty }
+    
     override init(_ parentId: ParentId) {
         super.init(parentId)
     }
@@ -64,6 +70,8 @@ class ItemsViewModel : RefreshableViewModelBase {
 class ItemViewModel : RefreshableViewModelBase {
     
     @Published var item: Item
+    
+    override var isEmpty: Bool { false }
     
     init(_ item: Item) {
         self.item = item

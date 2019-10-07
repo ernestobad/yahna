@@ -35,15 +35,15 @@ struct WebView : UIViewRepresentable {
     
     class Coordinator : NSObject, WKNavigationDelegate {
         func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-            print("--- Navigation success")
+            Log.logger.info("Navigation success")
         }
         
         func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-            print("--- Navigation failed with error: \(error)")
+            Log.logger.error("Navigation failed with error: \(error)")
         }
         
         func webView(_ webView: WKWebView, didFailProvisionalNavigation navigation: WKNavigation!, withError error: Error) {
-             print("--- Provisional Navigation failed with error: \(error)")
+            Log.logger.error("Provisional Navigation failed with error: \(error)")
         }
     }
 }
