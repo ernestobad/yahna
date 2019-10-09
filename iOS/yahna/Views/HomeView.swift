@@ -10,8 +10,6 @@ import SwiftUI
 
 struct HomeView: View {
     
-    @EnvironmentObject var webViewState: WebViewState
-    
     @State var topStories = ItemsViewModel(.topStories)
     @State var newStories = ItemsViewModel(.newStories)
     @State var askStories = ItemsViewModel(.askStories)
@@ -50,9 +48,6 @@ struct HomeView: View {
                     Image(systemName: "briefcase")
                     Text("Jobs")
             }
-        }.sheet(isPresented: $webViewState.isShowing, onDismiss: { self.webViewState.url = nil; }) {
-            WebViewContainerView()
-                .environmentObject(self.webViewState)
         }
     }
 }
@@ -60,6 +55,5 @@ struct HomeView: View {
 struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         return HomeView()
-            .environmentObject(WebViewState())
     }
 }

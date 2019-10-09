@@ -10,7 +10,7 @@ import SwiftUI
 
 struct WebViewContainerView: View {
     
-    @EnvironmentObject var webViewState: WebViewState
+    @ObservedObject var webViewState: WebViewState
     
     var body: some View {
         VStack(spacing: 0) {
@@ -46,6 +46,6 @@ struct WebViewContainerView_Previews: PreviewProvider {
         let webViewState = WebViewState()
         webViewState.isShowing = true
         webViewState.url = URL(string: "https://google.com")
-        return WebViewContainerView().environmentObject(webViewState)
+        return WebViewContainerView(webViewState: WebViewState())
     }
 }

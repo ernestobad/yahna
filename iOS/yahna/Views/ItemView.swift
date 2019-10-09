@@ -10,7 +10,7 @@ import SwiftUI
 
 struct ItemView: View {
     
-    @EnvironmentObject var webViewState: WebViewState
+    @ObservedObject var webViewState = WebViewState()
     
     @ObservedObject var viewModel: ItemViewModel
     
@@ -38,8 +38,8 @@ struct ItemView: View {
                 }
             }
                         
-        }.padding(.top, 50)
-            .edgesIgnoringSafeArea(.top)
+        }.padding(.top, -35)
+            //.edgesIgnoringSafeArea(.top)
             .onAppear {
                 DataProvider.shared.refreshViewModel(self.viewModel)
         }
@@ -55,6 +55,25 @@ struct ItemView: View {
                 .fixedSize(horizontal: false, vertical: true)
             
         }.padding(.horizontal)
+    }
+    
+    var linkSection: some View {
+        Button(action: {
+            
+            if let urlString = self.item.url, let url = URL(string: urlString) {
+                           self.webViewState.show(url: url)
+                       }
+            
+        }) {
+            Text(verbatim: item.urlWithoutProtocol)
+                .lineLimit(1)
+                .foregroundColor(Color(UIColor.systemBlue))
+                .font(Fonts.body.font)
+                .padding(.horizontal)
+            }
+            .popover(isPresented: $webViewState.isShowing) {
+                WebViewContainerView(webViewState: self.webViewState)
+            }
     }
     
     var bySection: some View {
@@ -80,23 +99,7 @@ struct ItemView: View {
                 .fixedSize(horizontal: false, vertical: true)
         }.padding(.horizontal)
     }
-    
-    var linkSection: some View {
-        Button(action: {
-            if let urlString = self.item.url, let url = URL(string: urlString) {
-                           self.webViewState.url = url
-                           self.webViewState.isShowing = true
-                       }
-            
-        }) {
-            Text(verbatim: item.urlWithoutProtocol)
-                .lineLimit(1)
-                .foregroundColor(Color(UIColor.systemBlue))
-                .font(Fonts.body.font)
-                .padding(.horizontal)
-        }
-    }
-    
+        
     var footer: some View {
         HStack(spacing:4) {
             
@@ -140,7 +143,6 @@ struct ItemView_Previews: PreviewProvider {
                         descendantsCount: 30)
         
         let itemView = ItemView(viewModel: ItemViewModel(item))
-            .environmentObject(WebViewState())
         
         return Group {
             itemView.environment(\.colorScheme, .light)

@@ -64,6 +64,5 @@ struct ItemsView_Previews: PreviewProvider {
         topStories.items = items
         
         return ItemsView(viewModel: topStories)
-            .environmentObject(WebViewState())
     }
 }

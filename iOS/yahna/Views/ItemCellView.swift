@@ -12,7 +12,7 @@ struct ItemCellView: View {
     
     var item: Item
     
-    @EnvironmentObject var webViewState: WebViewState
+    @ObservedObject var webViewState = WebViewState()
     
     var body: some View {
         VStack(alignment: .leading) {
@@ -58,9 +58,10 @@ struct ItemCellView: View {
                 .padding(.horizontal)
         }.onTapGesture {
             if let urlString = self.item.url, let url = URL(string: urlString) {
-                self.webViewState.url = url
-                self.webViewState.isShowing = true
+                self.webViewState.show(url: url)
             }
+        }.popover(isPresented: $webViewState.isShowing) {
+            WebViewContainerView(webViewState: self.webViewState)
         }
     }
     
@@ -108,7 +109,6 @@ struct ItemCellView_Previews: PreviewProvider {
                         descendantsCount: 30)
         
         let itemCellView = ItemCellView(item: item)
-        .environmentObject(WebViewState())
         
         return Group {
             itemCellView.environment(\.colorScheme, .light)

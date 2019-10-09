@@ -50,7 +50,7 @@ struct WebView : UIViewRepresentable {
 
 class WebViewState: ObservableObject {
     @Published var isShowing: Bool = false
-    @Published var url: URL? = nil
+    var url: URL? = nil
     
     func show(url: URL) {
         self.url = url
@@ -58,7 +58,7 @@ class WebViewState: ObservableObject {
     }
     
     func hide() {
-        self.isShowing = false
         self.url = nil
+        self.isShowing = false
     }
 }
