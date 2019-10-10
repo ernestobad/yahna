@@ -28,7 +28,13 @@ extension String {
             return nil
         }
         
-        attributedString.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: UIFont.labelFontSize), range: NSMakeRange(0, attributedString.length))
+        attributedString.addAttribute(NSAttributedString.Key.font,
+                                      value: UIFont.systemFont(ofSize: UIFont.labelFontSize),
+                                      range: NSMakeRange(0, attributedString.length))
+        
+        if attributedString.string.hasSuffix("\n") {
+            attributedString.deleteCharacters(in: NSMakeRange(attributedString.length-1, 1))
+        }
         
         return attributedString
     }

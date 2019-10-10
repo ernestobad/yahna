@@ -19,31 +19,36 @@ struct ItemView: View {
     }
     
     var body: some View {
-        ScrollView(.vertical, showsIndicators: true) {
-            
-            VStack(alignment: .leading, spacing: 8) {
-                titleSection
-                if !(item.url?.isEmpty ?? true) {
-                    linkSection
-                }
-                bySection
-                if !(item.text?.isEmpty ?? true) {
-                    textSection
-                }
-                footer
-                Divider()
+        GeometryReader { geometry in
+            ScrollView(.vertical, showsIndicators: true) {
+                VStack(alignment: .leading, spacing: 8) {
+                    self.titleSection
+                    if !(self.item.url?.isEmpty ?? true) {
+                        self.linkSection
+                    }
+                    self.bySection
+                    if !(self.item.text?.isEmpty ?? true) {
+                        TextView(attributedText: self.item.attributedText,
+                                 availableWidth: geometry.size.width-32)
+                    }
+                    self.footer
+                    Divider()
+                    
+                    ForEach(self.item.kids) { item in
+                        CommentView(item: item,
+                                    depth: 0,
+                                    availableWidth: geometry.size.width-32)
+                    }
+                }.padding(.horizontal, 16)
                 
-                ForEach(item.kids) { item in
-                    CommentView(depth: 0, item: item)
-                }
+                Rectangle()
+                    .fill(Color.clear)
             }
-                        
-        }.padding(.top, -35)
-            //.edgesIgnoringSafeArea(.top)
-            .onAppear {
-                DataProvider.shared.refreshViewModel(self.viewModel)
+            .padding(.top, -35)
+                .onAppear {
+                    DataProvider.shared.refreshViewModel(self.viewModel)
+            }
         }
-        
     }
     
     var titleSection: some View {
@@ -54,26 +59,23 @@ struct ItemView: View {
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
             
-        }.padding(.horizontal)
+        }
     }
     
     var linkSection: some View {
         Button(action: {
-            
             if let urlString = self.item.url, let url = URL(string: urlString) {
-                           self.webViewState.show(url: url)
-                       }
-            
+                self.webViewState.show(url: url)
+            }
         }) {
             Text(verbatim: item.urlWithoutProtocol)
                 .lineLimit(1)
                 .foregroundColor(Color(UIColor.systemBlue))
                 .font(Fonts.body.font)
-                .padding(.horizontal)
-            }
-            .popover(isPresented: $webViewState.isShowing) {
-                WebViewContainerView(webViewState: self.webViewState)
-            }
+        }
+        .popover(isPresented: $webViewState.isShowing) {
+            WebViewContainerView(webViewState: self.webViewState)
+        }
     }
     
     var bySection: some View {
@@ -87,19 +89,9 @@ struct ItemView: View {
             Text(verbatim: item.time.toTimeString())
                 .foregroundColor(Color(UIColor.systemGray))
                 .font(Fonts.caption.font)
-        }.padding([.leading, .trailing])
-            .fixedSize(horizontal: false, vertical: true)
+        }.fixedSize(horizontal: false, vertical: true)
     }
     
-    var textSection: some View {
-        VStack(alignment: .leading) {
-            Text(verbatim: item.text ?? "")
-                .font(Fonts.body.font)
-                .lineLimit(nil)
-                .fixedSize(horizontal: false, vertical: true)
-        }.padding(.horizontal)
-    }
-        
     var footer: some View {
         HStack(spacing:4) {
             
@@ -120,8 +112,7 @@ struct ItemView: View {
                 .foregroundColor(Color(UIColor.systemGray))
                 .font(Fonts.caption.font)
             
-        }.padding(.horizontal)
-        .fixedSize(horizontal: false, vertical: true)
+        }.fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -133,7 +124,7 @@ struct ItemView_Previews: PreviewProvider {
                         type: ItemType.story,
                         by: "foobar",
                         time: Date(),
-                        text: "test test 1",
+                        text: "Foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar.",
                         dead: false,
                         parent: nil,
                         poll: nil,

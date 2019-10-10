@@ -10,9 +10,11 @@ import SwiftUI
 
 struct CommentView: View {
     
+    let item: Item
+    
     let depth: Int
     
-    let item: Item
+    let availableWidth: CGFloat
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -22,8 +24,10 @@ struct CommentView: View {
             }
             
             ForEach(item.kids) { item in
-                CommentView(depth: self.depth+1, item: item)
-                .padding(.leading, 10)
+                CommentView(item: item,
+                            depth: self.depth+1,
+                            availableWidth: self.availableWidth-10)
+                    .padding(.leading, 10)
             }
         }
     }
@@ -39,14 +43,12 @@ struct CommentView: View {
             Text(verbatim: item.time.toTimeString())
                 .foregroundColor(Color(UIColor.systemGray))
                 .font(Fonts.caption.font)
-        }.padding([.leading, .trailing])
-            .fixedSize(horizontal: false, vertical: true)
+        }.fixedSize(horizontal: false, vertical: true)
     }
     
     var textSection: some View {
-        VStack(alignment: .leading) {
-            TextView(attributedText: self.item.attributedText ?? NSAttributedString(string: ""))
-        }.padding(.horizontal)
+        TextView(attributedText: self.item.attributedText,
+                 availableWidth: availableWidth)
     }
 }
 
@@ -67,6 +69,6 @@ struct CommentView_Previews: PreviewProvider {
                         title: "",
                         descendantsCount: 30)
         
-        return CommentView(depth: 0, item: item)
+        return CommentView(item: item, depth: 0, availableWidth: 300)
     }
 }

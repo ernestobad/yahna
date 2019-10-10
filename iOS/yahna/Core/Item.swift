@@ -87,7 +87,8 @@ class Item : Identifiable {
         poll = jsonItem.poll
         url = jsonItem.url
         score = jsonItem.score
-        title = jsonItem.title?.attributedStringFromHtmlEncodedString()?.string
+        title = jsonItem.title
+        
         descendantsCount = jsonItem.descendants
         partsIds = jsonItem.parts ?? [Int64]()
         kidsIds = jsonItem.kids ?? [Int64]()
