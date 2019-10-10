@@ -24,11 +24,11 @@ extension String {
             .characterEncoding: String.Encoding.utf8.rawValue
         ]
         
-        guard let attributedString = try? NSAttributedString(data: data, options: options, documentAttributes: nil) else {
+        guard let attributedString = try? NSMutableAttributedString(data: data, options: options, documentAttributes: nil) else {
             return nil
         }
         
-        //attributedString.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: 20), range: NSMakeRange(0, str.count))
+        attributedString.addAttribute(NSAttributedString.Key.font, value: UIFont.systemFont(ofSize: UIFont.labelFontSize), range: NSMakeRange(0, attributedString.length))
         
         return attributedString
     }

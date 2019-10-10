@@ -45,12 +45,7 @@ struct CommentView: View {
     
     var textSection: some View {
         VStack(alignment: .leading) {
-//            TextView(attributedText: item.attributedText ?? NSAttributedString(string: ""))
-//                fixedSize(horizontal: false, vertical: true)
-            Text(verbatim: item.attributedText?.string ?? "")
-                .font(Fonts.body.font)
-                .lineLimit(nil)
-                .fixedSize(horizontal: false, vertical: true)
+            TextView(attributedText: self.item.attributedText ?? NSAttributedString(string: ""))
         }.padding(.horizontal)
     }
 }
