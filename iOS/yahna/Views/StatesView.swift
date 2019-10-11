@@ -8,9 +8,13 @@
 
 import SwiftUI
 
-struct StatesView<Content, ViewModel>: View where Content : View, ViewModel : RefreshableViewModel {
+struct StatesView<ErrorV, EmptyV, Content, ViewModel>: View where ErrorV : View, EmptyV : View, Content : View, ViewModel : RefreshableViewModel {
 
     var viewModel: ViewModel
+    
+    var error: () -> ErrorV
+    
+    var empty: () -> EmptyV
     
     var content: () -> Content
     
@@ -31,42 +35,59 @@ struct StatesView<Content, ViewModel>: View where Content : View, ViewModel : Re
     }
     
     var body: some View {
-        ZStack(alignment: .center) {
+        // Content
+        if self.shouldShowContent {
+            return AnyView(self.content())
+        }
+        
+        // Loading
+        if self.shouldShowLoadingView {
+            return AnyView(DefaultProgressView())
+        }
+        
+        // Error
+        if self.shouldShowErrorView {
+            return AnyView(self.error())
+        }
+        
+        if self.shouldShowEmptyView {
+            return AnyView(self.empty())
+        }
+        
+        return AnyView(EmptyView())
+    }
+}
 
-            // Content
-            self.content()
-                .disabled(!self.shouldShowContent)
-                .opacity(self.shouldShowContent ? 1 : 0)
+struct DefaultProgressView: View {
+    var body: some View {
+        ActivityIndicator(isAnimating: .constant(true), style: .large)
+            .frame(minWidth: 200, maxWidth: .infinity, minHeight: 200, maxHeight: .infinity)
+    }
+}
 
-            // Loading
-            ActivityIndicator(isAnimating: .constant(true), style: .large)
-                .disabled(!self.shouldShowLoadingView)
-                .opacity(self.shouldShowLoadingView ? 1 : 0)
-            
-            // Error
-            VStack {
-                Image(systemName: "wifi.exclamationmark")
-                    .resizable()
-                    .aspectRatio(1, contentMode: .fit)
-                    .frame(width: 100, height: 100, alignment: .center)
-                Text(Strings.errorMessage.localizedStringKey)
-            }
-            .foregroundColor(Color.init(UIColor.systemGray2))
-            .disabled(!self.shouldShowErrorView)
-                .opacity(self.shouldShowErrorView ? 1 : 0)
-            
-            // Empty
-            VStack {
-                Image(systemName: "moon.zzz")
-                    .resizable()
-                    .aspectRatio(1, contentMode: .fit)
-                    .frame(width: 100, height: 100, alignment: .center)
-                Text(Strings.emptyViewMessage.localizedStringKey)
-            }
-            .foregroundColor(Color.init(UIColor.systemGray2))
-            .disabled(!self.shouldShowEmptyView)
-                .opacity(self.shouldShowEmptyView ? 1 : 0)
-            
+struct DefaultEmptyView: View {
+    
+    var body: some View {
+        VStack {
+            Image(systemName: "moon.zzz")
+                .resizable()
+                .aspectRatio(1, contentMode: .fit)
+                .frame(width: 100, height: 100, alignment: .center)
+            Text(Strings.emptyViewMessage.localizedStringKey)
+        }
+        .foregroundColor(Color.init(UIColor.systemGray2))
+    }
+}
+
+struct DefaultErrorView: View {
+    
+    var body: some View {
+        VStack {
+            Image(systemName: "wifi.exclamationmark")
+                .resizable()
+                .aspectRatio(1, contentMode: .fit)
+                .frame(width: 100, height: 100, alignment: .center)
+            Text(Strings.errorMessage.localizedStringKey)
         }
     }
 }

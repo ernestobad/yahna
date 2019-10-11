@@ -14,7 +14,7 @@ struct ItemsView: View {
     
     var body: some View {
         NavigationView {
-            StatesView(viewModel: viewModel) {
+            StatesView(viewModel: viewModel, error: { DefaultErrorView() }, empty: { DefaultEmptyView() }) {
                 GeometryReader { geometry in
                     List(self.viewModel.items) { (item) in
                         ItemCellView(item: item,

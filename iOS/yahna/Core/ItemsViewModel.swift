@@ -71,7 +71,7 @@ class ItemViewModel : RefreshableViewModelBase {
     
     @Published var item: Item
     
-    override var isEmpty: Bool { false }
+    override var isEmpty: Bool { item.kids.isEmpty }
     
     init(_ item: Item) {
         self.item = item

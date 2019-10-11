@@ -37,11 +37,16 @@ struct ItemView: View {
                     self.footer
                     Divider()
                     
-                    ForEach(self.item.kids) { item in
-                        CommentView(item: item,
-                                    depth: 0,
-                                    availableWidth: geometry.size.width-32)
+                    StatesView(viewModel: self.viewModel, error: { EmptyView() }, empty: { EmptyView() }) {
+                        VStack(alignment: .leading, spacing: 8) {
+                            ForEach(self.item.kids) { item in
+                                CommentView(item: item,
+                                            depth: 0,
+                                            availableWidth: geometry.size.width-32)
+                            }
+                        }
                     }
+                    
                 }.padding(.horizontal, 16)
                 
                 Rectangle()
