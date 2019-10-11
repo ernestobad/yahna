@@ -116,17 +116,15 @@ class Item : Identifiable {
             return ""
         }
         
-        let httpPrefix = "http://"
-        let httpsPrefix = "https://"
+        let prefixesToRemove = ["http://www.", "https://www.", "https://", "http://"]
         
-        if urlString.starts(with: httpPrefix) {
-            let idx = urlString.index(urlString.startIndex, offsetBy: httpPrefix.count)
-            return String(urlString.suffix(from: idx))
-        } else if urlString.starts(with: httpsPrefix) {
-            let idx = urlString.index(urlString.startIndex, offsetBy: httpsPrefix.count)
-            return String(urlString.suffix(from: idx))
-        } else {
-            return urlString
+        for prefix in prefixesToRemove {
+            if urlString.starts(with: prefix) {
+                let idx = urlString.index(urlString.startIndex, offsetBy: prefix.count)
+                return String(urlString.suffix(from: idx))
+            }
         }
+        
+        return urlString
     }
 }

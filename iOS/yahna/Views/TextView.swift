@@ -22,7 +22,21 @@ struct TextView: UIViewRepresentable {
     let attributedText: NSAttributedString?
     
     let availableWidth: CGFloat
-
+    
+    let maximumNumberOfLines: Int
+    
+    let lineBreakMode: NSLineBreakMode
+    
+    init(attributedText: NSAttributedString?,
+         availableWidth: CGFloat = CGFloat.greatestFiniteMagnitude,
+         maximumNumberOfLines: Int = 0,
+         lineBreakMode: NSLineBreakMode = .byWordWrapping) {
+        self.attributedText = attributedText
+        self.availableWidth = availableWidth
+        self.maximumNumberOfLines = maximumNumberOfLines
+        self.lineBreakMode = lineBreakMode
+    }
+    
     func makeUIView(context: Context) -> MyTextView {
         let textView = MyTextView(frame: .zero)
         textView.isScrollEnabled = false
@@ -31,13 +45,16 @@ struct TextView: UIViewRepresentable {
         textView.textContainerInset = .zero
         textView.textContainer.lineFragmentPadding = 0
         
+        textView.textContainer.maximumNumberOfLines = maximumNumberOfLines
+        textView.textContainer.lineBreakMode = lineBreakMode
+        
         textView.setContentHuggingPriority(.required, for: .horizontal)
         textView.setContentHuggingPriority(.required, for: .vertical)
         textView.setContentCompressionResistancePriority(.required, for: .horizontal)
         textView.setContentCompressionResistancePriority(.required, for: .vertical)
         return textView
     }
-
+    
     func updateUIView(_ textView: MyTextView, context: Context) {
         textView.attributedText = attributedText
         textView.intrinsicSize = textView.sizeThatFits(CGSize(width: availableWidth, height: CGFloat.greatestFiniteMagnitude))
@@ -57,7 +74,7 @@ struct TextView_Previews: PreviewProvider {
                     Text(verbatim: "@user")
                     GeometryReader { geometry in
                         TextView(attributedText: attributedString,
-                        availableWidth: 414)
+                                 availableWidth: 414)
                     }.frame(minWidth: 0, maxWidth: .infinity)
                     Text(verbatim: "x")
                 }
@@ -79,6 +96,6 @@ struct TextView_Previews: PreviewProvider {
                              availableWidth: 414)
                     Text(verbatim: "x")
                 }
-            }
+        }
     }
 }

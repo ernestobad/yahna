@@ -12,16 +12,22 @@ struct ItemCellView: View {
     
     var item: Item
     
+    let availableWidth: CGFloat
+    
     @ObservedObject var webViewState = WebViewState()
     
     var body: some View {
-        VStack(alignment: .leading) {
-            bySection
-            titleSection
-            linkSection
-            footerSection
+        VStack(alignment: .leading, spacing: 8) {
+            bySection.padding(.horizontal, 16)
+            NavigationLink(destination: ItemView(viewModel: ItemViewModel(item))) {
+                titleSection.padding(.horizontal, 16)
+            }
+            if item.url != nil {
+                linkSection.padding(.horizontal, 16)
+            }
+            footerSection.padding(.horizontal, 16)
             Divider()
-        }
+        }.padding(.top, 8)
     }
     
     var bySection: some View {
@@ -35,34 +41,20 @@ struct ItemCellView: View {
             Text(verbatim: item.time.toTimeString())
                 .foregroundColor(Color(UIColor.systemGray))
                 .font(Fonts.caption.font)
-        }.padding(.horizontal)
-            .fixedSize(horizontal: false, vertical: true)
+        }.fixedSize(horizontal: false, vertical: true)
     }
     
     var titleSection: some View {
-        NavigationLink(destination: ItemView(viewModel: ItemViewModel(item))) {
-            HStack {
-                Text(verbatim: item.title ?? "")
-                    .font(Fonts.body.font)
-                    .lineLimit(nil)
-            }.padding(.horizontal)
-        }.padding(.trailing, -20)
+        Text(verbatim: item.title ?? "")
+            .font(Fonts.body.font)
+            .lineLimit(nil)
     }
     
     var linkSection: some View {
-        Button(action: { }) {
-            Text(verbatim: item.urlWithoutProtocol)
-                .lineLimit(1)
-                .foregroundColor(Color(UIColor.systemBlue))
-                .font(Fonts.body.font)
-                .padding(.horizontal)
-        }.onTapGesture {
-            if let urlString = self.item.url, let url = URL(string: urlString) {
-                self.webViewState.show(url: url)
-            }
-        }.popover(isPresented: $webViewState.isShowing) {
-            WebViewContainerView(webViewState: self.webViewState)
-        }
+        TextView(attributedText: linkAttributedString,
+                 availableWidth: availableWidth - 32,
+                 maximumNumberOfLines: 1,
+                 lineBreakMode: .byTruncatingTail)
     }
     
     var footerSection: some View {
@@ -76,17 +68,24 @@ struct ItemCellView: View {
                 .foregroundColor(Color(UIColor.systemGray2))
                 .font(Fonts.caption.font)
             
-            Image(systemName: "bubble.left.and.bubble.right")
-                .resizable()
-                .frame(width: 19, height: 16, alignment: .center)
-                .foregroundColor(Color(UIColor.systemGray))
-            
-            Text(verbatim: "\(item.descendantsCount ?? 0)")
+            Text(verbatim: "\(item.descendantsCount ?? 0) comments")
                 .foregroundColor(Color(UIColor.systemGray))
                 .font(Fonts.caption.font)
             
-        }.padding(.horizontal)
-        .fixedSize(horizontal: false, vertical: true)
+        }.fixedSize(horizontal: false, vertical: true)
+    }
+    
+    var linkAttributedString: NSAttributedString? {
+        
+        guard let url = item.url else {
+            return nil
+        }
+        
+        let attributes: [NSAttributedString.Key: Any] = [.link: url,
+                                                         .font: UIFont.systemFont(ofSize: UIFont.labelFontSize),
+                                                         .foregroundColor: UIColor.systemTeal]
+        
+        return NSAttributedString(string: item.urlWithoutProtocol, attributes: attributes)
     }
 }
 
@@ -108,11 +107,11 @@ struct ItemCellView_Previews: PreviewProvider {
                         title: "WeWork says will file to withdraw IPO, WeWork says will file to withdraw IPO",
                         descendantsCount: 30)
         
-        let itemCellView = ItemCellView(item: item)
+        let itemCellView = ItemCellView(item: item, availableWidth: 414)
         
         return Group {
             itemCellView.environment(\.colorScheme, .light)
            itemCellView.environment(\.colorScheme, .dark)
-        }.previewLayout(.fixed(width: 300, height: 300)).background(Color(UIColor.systemBackground))
+        }.previewLayout(.fixed(width: 414, height: 300)).background(Color(UIColor.systemBackground))
     }
 }

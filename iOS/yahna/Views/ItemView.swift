@@ -103,12 +103,7 @@ struct ItemView: View {
                 .foregroundColor(Color(UIColor.systemGray2))
                 .font(Fonts.caption.font)
             
-            Image(systemName: "bubble.left.and.bubble.right")
-                .resizable()
-                .frame(width: 19, height: 16, alignment: .center)
-                .foregroundColor(Color(UIColor.systemGray))
-            
-            Text(verbatim: "\(item.descendantsCount ?? 0)")
+            Text(verbatim: "\(item.descendantsCount ?? 0) comments")
                 .foregroundColor(Color(UIColor.systemGray))
                 .font(Fonts.caption.font)
             
