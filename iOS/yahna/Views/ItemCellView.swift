@@ -51,7 +51,7 @@ struct ItemCellView: View {
     }
     
     var linkSection: some View {
-        TextView(attributedText: linkAttributedString,
+        TextView(attributedText: item.attributedLink,
                  availableWidth: availableWidth - 32,
                  maximumNumberOfLines: 1,
                  lineBreakMode: .byTruncatingTail)
@@ -73,19 +73,6 @@ struct ItemCellView: View {
                 .font(Fonts.caption.font)
             
         }.fixedSize(horizontal: false, vertical: true)
-    }
-    
-    var linkAttributedString: NSAttributedString? {
-        
-        guard let url = item.url else {
-            return nil
-        }
-        
-        let attributes: [NSAttributedString.Key: Any] = [.link: url,
-                                                         .font: UIFont.systemFont(ofSize: UIFont.labelFontSize),
-                                                         .foregroundColor: UIColor.systemTeal]
-        
-        return NSAttributedString(string: item.urlWithoutProtocol, attributes: attributes)
     }
 }
 

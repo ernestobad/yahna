@@ -15,15 +15,17 @@ struct ItemsView: View {
     var body: some View {
         NavigationView {
             StatesView(viewModel: viewModel) {
-                List(self.viewModel.items) { (item) in
-                    ItemCellView(item: item,
-                                 availableWidth: 414)
-                        .padding(.bottom, -12)
+                GeometryReader { geometry in
+                    List(self.viewModel.items) { (item) in
+                        ItemCellView(item: item,
+                                     availableWidth: geometry.size.width)
+                            .padding(.bottom, -12)
+                    }
+                    .padding(.leading, -20)
+                    .padding(.trailing, -40)
+                    .navigationBarTitle(Text(self.viewModel.parentId.title ?? "")
+                    .font(Fonts.largeTitle.font))
                 }
-                .padding(.leading, -20)
-                .padding(.trailing, -40)
-                .navigationBarTitle(Text(self.viewModel.parentId.title ?? "")
-                .font(Fonts.largeTitle.font))
             }
         }.onAppear {
             UITableView.appearance().separatorColor = .clear

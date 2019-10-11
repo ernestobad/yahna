@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		941B00AB234BEA2100BAA5D8 /* TextView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941B00AA234BEA2100BAA5D8 /* TextView.swift */; };
-		941B00AD234BEB5300BAA5D8 /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 941B00AC234BEB5300BAA5D8 /* StringExtensions.swift */; };
 		942B72D12347F9000049EF5D /* ActivityIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942B72D02347F9000049EF5D /* ActivityIndicatorView.swift */; };
 		942B72D32348DA570049EF5D /* StatesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942B72D22348DA570049EF5D /* StatesView.swift */; };
 		942B72D7234A1E320049EF5D /* Fonts.swift in Sources */ = {isa = PBXBuildFile; fileRef = 942B72D6234A1E320049EF5D /* Fonts.swift */; };
@@ -43,7 +42,6 @@
 
 /* Begin PBXFileReference section */
 		941B00AA234BEA2100BAA5D8 /* TextView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextView.swift; sourceTree = "<group>"; };
-		941B00AC234BEB5300BAA5D8 /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
 		942B72D02347F9000049EF5D /* ActivityIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatorView.swift; sourceTree = "<group>"; };
 		942B72D22348DA570049EF5D /* StatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatesView.swift; sourceTree = "<group>"; };
 		942B72D6234A1E320049EF5D /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
@@ -139,7 +137,6 @@
 			isa = PBXGroup;
 			children = (
 				948B37D423416B170062C229 /* DateExtensions.swift */,
-				941B00AC234BEB5300BAA5D8 /* StringExtensions.swift */,
 			);
 			name = Utils;
 			sourceTree = "<group>";
@@ -314,7 +311,6 @@
 				943FCD30232D13F30051B94C /* HomeView.swift in Sources */,
 				948B37E82345076C0062C229 /* ItemView.swift in Sources */,
 				9472051923463ABF00DF65F2 /* WebView.swift in Sources */,
-				941B00AD234BEB5300BAA5D8 /* StringExtensions.swift in Sources */,
 				94E101022333A8CB00721E4D /* Log.swift in Sources */,
 				948B37D523416B170062C229 /* DateExtensions.swift in Sources */,
 			);

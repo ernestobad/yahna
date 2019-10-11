@@ -24,7 +24,10 @@ struct ItemView: View {
                 VStack(alignment: .leading, spacing: 8) {
                     self.titleSection
                     if !(self.item.url?.isEmpty ?? true) {
-                        self.linkSection
+                        TextView(attributedText: self.item.attributedLink,
+                                 availableWidth: geometry.size.width - 32,
+                                 maximumNumberOfLines: 1,
+                                 lineBreakMode: .byTruncatingTail)
                     }
                     self.bySection
                     if !(self.item.text?.isEmpty ?? true) {
@@ -59,22 +62,6 @@ struct ItemView: View {
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
             
-        }
-    }
-    
-    var linkSection: some View {
-        Button(action: {
-            if let urlString = self.item.url, let url = URL(string: urlString) {
-                self.webViewState.show(url: url)
-            }
-        }) {
-            Text(verbatim: item.urlWithoutProtocol)
-                .lineLimit(1)
-                .foregroundColor(Color(UIColor.systemBlue))
-                .font(Fonts.body.font)
-        }
-        .popover(isPresented: $webViewState.isShowing) {
-            WebViewContainerView(webViewState: self.webViewState)
         }
     }
     

@@ -39,7 +39,7 @@ extension Date {
             let hrs = Int(i/Date.oneHour)
             return "\(hrs)h"
         case let i where i >= Date.oneDay && i < Date.oneWeek:
-            let days = Int(Date.oneDay)
+            let days = Int(i/Date.oneDay)
             return "\(days)d"
         default:
             return Date.dateFormatter.string(from: self)

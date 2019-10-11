@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import UIKit
 
 enum ItemType: String {
     case job
@@ -24,13 +25,15 @@ class Item : Identifiable {
     let by: String?
     let time: Date
     let text: String?
-    let attributedText: NSAttributedString?
     let dead: Bool
     let parent: Int64?
     let poll: Int64?
     let url: String?
     let score: Int64?
     let title: String?
+    
+    let attributedText: NSAttributedString?
+    let attributedLink: NSAttributedString?
     
     var partsIds = [Int64]()
     var kidsIds = [Int64]()
@@ -59,7 +62,6 @@ class Item : Identifiable {
         self.by = by
         self.time = time
         self.text = text
-        self.attributedText = text?.attributedStringFromHtmlEncodedString()
         self.dead = dead
         self.parent = parent
         self.poll = poll
@@ -67,6 +69,9 @@ class Item : Identifiable {
         self.score = score
         self.title = title
         self.descendantsCount = descendantsCount
+        
+        attributedText = Item.attributedText(from: text)
+        attributedLink = Item.attributedLink(from: url)
     }
     
     init?(jsonItem: JsonItem) {
@@ -81,7 +86,6 @@ class Item : Identifiable {
         by = jsonItem.by
         time = Date.init(timeIntervalSince1970: TimeInterval(jsonItem.time ?? 0))
         text = jsonItem.text
-        attributedText = jsonItem.text?.attributedStringFromHtmlEncodedString()
         dead = jsonItem.dead ?? false
         parent = jsonItem.parent
         poll = jsonItem.poll
@@ -92,39 +96,69 @@ class Item : Identifiable {
         descendantsCount = jsonItem.descendants
         partsIds = jsonItem.parts ?? [Int64]()
         kidsIds = jsonItem.kids ?? [Int64]()
+        
+        attributedText = Item.attributedText(from: text)
+        attributedLink = Item.attributedLink(from: url)
+    }
+}
+
+extension Item {
+    
+    
+    static func attributedLink(from url: String?) -> NSAttributedString? {
+        
+        guard let url = url else {
+            return nil
+        }
+        
+        let attributes: [NSAttributedString.Key: Any] = [.link: url,
+                                                         .font: UIFont.systemFont(ofSize: UIFont.labelFontSize),
+                                                         .foregroundColor: UIColor.systemTeal]
+        
+        return NSAttributedString(string: urlWithoutProtocol(url), attributes: attributes)
     }
     
-    var domain: String {
-        guard let urlString = self.url,
-            let url = URL(string: urlString),
-            let host = url.host else {
-                return ""
+    static func attributedText(from encodedText: String?) -> NSAttributedString? {
+        
+        guard let str = encodedText else {
+            return nil
         }
         
-        let tokens = host.split(separator: Character("."))
+        guard let data = str.data(using: .utf8) else {
+            return nil
+        }
+
+        let options: [NSAttributedString.DocumentReadingOptionKey: Any] = [
+            .documentType: NSAttributedString.DocumentType.html,
+            .characterEncoding: String.Encoding.utf8.rawValue
+        ]
         
-        guard tokens.count >= 2 else {
-            return ""
+        guard let attributedString = try? NSMutableAttributedString(data: data, options: options, documentAttributes: nil) else {
+            return nil
         }
         
-        return "\(tokens[tokens.count-2]).\(tokens[tokens.count-1])"
+        attributedString.addAttribute(NSAttributedString.Key.font,
+                                      value: UIFont.systemFont(ofSize: UIFont.labelFontSize),
+                                      range: NSMakeRange(0, attributedString.length))
+        
+        if attributedString.string.hasSuffix("\n") {
+            attributedString.deleteCharacters(in: NSMakeRange(attributedString.length-1, 1))
+        }
+        
+        return attributedString
     }
     
-    var urlWithoutProtocol: String {
-        
-        guard let urlString = self.url else {
-            return ""
-        }
+    static func urlWithoutProtocol(_ url: String) -> String {
         
         let prefixesToRemove = ["http://www.", "https://www.", "https://", "http://"]
         
         for prefix in prefixesToRemove {
-            if urlString.starts(with: prefix) {
-                let idx = urlString.index(urlString.startIndex, offsetBy: prefix.count)
-                return String(urlString.suffix(from: idx))
+            if url.starts(with: prefix) {
+                let idx = url.index(url.startIndex, offsetBy: prefix.count)
+                return String(url.suffix(from: idx))
             }
         }
         
-        return urlString
+        return url
     }
 }
