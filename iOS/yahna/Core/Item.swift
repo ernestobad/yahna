@@ -41,7 +41,7 @@ class Item : Identifiable {
     var parts = [Item]()
     var kids = [Item]()
     
-    let descendantsCount: Int64?
+    var descendantsCount: Int64?
     
     init(id: Int64,
          deleted: Bool,
@@ -99,6 +99,26 @@ class Item : Identifiable {
         
         attributedText = Item.attributedText(from: text)
         attributedLink = Item.attributedLink(from: url)
+    }
+    
+    @discardableResult
+    func calcDescendantCountsAndSortKids() -> Int {
+        var count = 0
+        self.kids.forEach {
+            count += 1
+            count += $0.calcDescendantCountsAndSortKids()
+        }
+        self.kids.sort {
+            let lcount = $0.descendantsCount!
+            let rcount = $1.descendantsCount!
+            if lcount != rcount {
+                return lcount > rcount
+            } else {
+                return $0.id > $1.id
+            }
+        }
+        self.descendantsCount = Int64(count)
+        return count
     }
 }
 

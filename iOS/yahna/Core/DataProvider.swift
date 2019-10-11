@@ -52,11 +52,12 @@ class DataProvider {
                     var idToItemMap = [Int64: Item]()
                     idToItemMap[parent.id] = parent
                     items.forEach { idToItemMap[$0.id] = $0 }
-                    idToItemMap.values.sorted(by: { $0.id < $1.id }).forEach {
+                    idToItemMap.values.forEach {
                         if let parentId = $0.parent, let parent = idToItemMap[parentId] {
                             parent.kids.append($0)
                         }
                     }
+                    parent.calcDescendantCountsAndSortKids()
                     return [parent]
                 } else {
                     return items
