@@ -53,9 +53,6 @@ class DataProvider {
                     idToItemMap[parent.id] = parent
                     items.forEach { idToItemMap[$0.id] = $0 }
                     idToItemMap.values.sorted(by: { $0.id < $1.id }).forEach {
-                        if $0.text?.contains("earning 300k") ?? false {
-                            print("found")
-                        }
                         if let parentId = $0.parent, let parent = idToItemMap[parentId] {
                             parent.kids.append($0)
                         }

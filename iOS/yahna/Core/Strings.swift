@@ -23,11 +23,26 @@ enum Strings: String {
     case errorMessage
     case emptyViewMessage
     
+    case pointsFormat
+    case singlePointText
+    case commentsFormat
+    case singleCommentText
+    
     var localizedString: String {
         return NSLocalizedString(self.rawValue, comment: "")
     }
     
     var localizedStringKey: LocalizedStringKey {
         return LocalizedStringKey(self.rawValue)
+    }
+    
+    func localizedStringWithFormat(_ args: CVarArg...) -> String {
+        let format = localizedString
+        
+        let result = withVaList(args) {
+            (NSString(format: format, locale: NSLocale.current, arguments: $0) as String)
+        }
+        
+        return result
     }
 }

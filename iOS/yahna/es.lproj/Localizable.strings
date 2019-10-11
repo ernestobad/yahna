@@ -17,3 +17,8 @@
 
 "errorMessage" = "Por favor verifica tu conexión";
 "emptyViewMessage" = "No hay nada aqui";
+
+"pointsFormat" = "%@ puntos";
+"singlePointText" = "1 punto";
+"commentsFormat" = "%@ comentarios";
+"singleCommentText" = "1 comentario";

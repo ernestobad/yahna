@@ -82,7 +82,7 @@ struct ItemView: View {
     var footer: some View {
         HStack(spacing:4) {
             
-            Text(verbatim: "\(item.score ?? 0) points")
+            Text(verbatim: item.pointsString)
                 .foregroundColor(Color(UIColor.systemGray))
                 .font(Fonts.caption.font)
             
@@ -90,7 +90,7 @@ struct ItemView: View {
                 .foregroundColor(Color(UIColor.systemGray2))
                 .font(Fonts.caption.font)
             
-            Text(verbatim: "\(item.descendantsCount ?? 0) comments")
+            Text(verbatim: item.commentsString)
                 .foregroundColor(Color(UIColor.systemGray))
                 .font(Fonts.caption.font)
             

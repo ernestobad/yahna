@@ -104,6 +104,17 @@ class Item : Identifiable {
 
 extension Item {
     
+    var pointsString: String {
+        let points = score ?? 0
+        if points == 1 { return Strings.singlePointText.localizedString }
+        else { return Strings.pointsFormat.localizedStringWithFormat(Int(points)) }
+    }
+    
+    var commentsString: String {
+        let comments = descendantsCount ?? 0
+        if comments == 1 { return Strings.singleCommentText.localizedString }
+        else { return Strings.commentsFormat.localizedStringWithFormat(Int(comments)) }
+    }
     
     static func attributedLink(from url: String?) -> NSAttributedString? {
         

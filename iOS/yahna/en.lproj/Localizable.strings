@@ -17,3 +17,8 @@
 
 "errorMessage" = "Please verify your network connection";
 "emptyViewMessage" = "There are no stories here yet";
+
+"pointsFormat" = "%d points";
+"singlePointText" = "1 point";
+"commentsFormat" = "%d comments";
+"singleCommentText" = "1 comment";
