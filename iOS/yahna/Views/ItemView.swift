@@ -99,6 +99,11 @@ struct ItemView: View {
                 .foregroundColor(Color(UIColor.systemGray))
                 .font(Fonts.caption.font)
             
+            Spacer()
+            
+            TextView(attributedText: self.item.attributedHNLink,
+                     availableWidth: 100)
+            
         }.fixedSize(horizontal: false, vertical: true)
     }
 }

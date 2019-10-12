@@ -34,9 +34,10 @@ class Item : Identifiable {
     
     let attributedText: NSAttributedString?
     let attributedLink: NSAttributedString?
+    let attributedHNLink: NSAttributedString?
     
-    var partsIds = [Int64]()
-    var kidsIds = [Int64]()
+    var partsIds: [Int64]
+    var kidsIds: [Int64]
     
     var parts = [Item]()
     var kids = [Item]()
@@ -55,7 +56,9 @@ class Item : Identifiable {
          url: String?,
          score: Int64?,
          title: String?,
-         descendantsCount: Int64?) {
+         descendantsCount: Int64? = nil,
+         partsIds: [Int64]? = nil,
+         kidsIds: [Int64]? = nil) {
         self.id = id
         self.deleted = deleted
         self.type = type
@@ -69,36 +72,35 @@ class Item : Identifiable {
         self.score = score
         self.title = title
         self.descendantsCount = descendantsCount
+        self.partsIds = partsIds ?? [Int64]()
+        self.kidsIds = kidsIds ?? [Int64]()
         
         attributedText = Item.attributedText(from: text)
-        attributedLink = Item.attributedLink(from: url)
+        attributedLink = Item.attributedLink(from: url, text: Item.urlWithoutProtocol(url ?? ""))
+        attributedHNLink = Item.attributedLink(from: "https://news.ycombinator.com/item?id=\(id)", text: "HN", font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize))
     }
     
-    init?(jsonItem: JsonItem) {
+    convenience init?(jsonItem: JsonItem) {
         
         guard jsonItem.id > 0, let itemType = ItemType(rawValue: jsonItem.type) else {
             return nil
         }
         
-        id = jsonItem.id
-        deleted = jsonItem.deleted ?? false
-        type = itemType
-        by = jsonItem.by
-        time = Date.init(timeIntervalSince1970: TimeInterval(jsonItem.time ?? 0))
-        text = jsonItem.text
-        dead = jsonItem.dead ?? false
-        parent = jsonItem.parent
-        poll = jsonItem.poll
-        url = jsonItem.url
-        score = jsonItem.score
-        title = jsonItem.title
-        
-        descendantsCount = jsonItem.descendants
-        partsIds = jsonItem.parts ?? [Int64]()
-        kidsIds = jsonItem.kids ?? [Int64]()
-        
-        attributedText = Item.attributedText(from: text)
-        attributedLink = Item.attributedLink(from: url)
+        self.init(id: jsonItem.id,
+                  deleted: jsonItem.deleted ?? false,
+                  type: itemType,
+                  by: jsonItem.by,
+                  time: Date.init(timeIntervalSince1970: TimeInterval(jsonItem.time ?? 0)),
+                  text: jsonItem.text,
+                  dead: jsonItem.dead ?? false,
+                  parent: jsonItem.parent,
+                  poll: jsonItem.poll,
+                  url: jsonItem.url,
+                  score: jsonItem.score,
+                  title: jsonItem.title,
+                  descendantsCount: jsonItem.descendants,
+                  partsIds: jsonItem.parts,
+                  kidsIds: jsonItem.kids)
     }
     
     @discardableResult
@@ -136,17 +138,17 @@ extension Item {
         else { return Strings.commentsFormat.localizedStringWithFormat(Int(comments)) }
     }
     
-    static func attributedLink(from url: String?) -> NSAttributedString? {
+    static func attributedLink(from url: String?, text: String, font: UIFont = UIFont.systemFont(ofSize: UIFont.labelFontSize)) -> NSAttributedString? {
         
         guard let url = url else {
             return nil
         }
         
         let attributes: [NSAttributedString.Key: Any] = [.link: url,
-                                                         .font: UIFont.systemFont(ofSize: UIFont.labelFontSize),
+                                                         .font: font,
                                                          .foregroundColor: UIColor.systemTeal]
         
-        return NSAttributedString(string: urlWithoutProtocol(url), attributes: attributes)
+        return NSAttributedString(string: text, attributes: attributes)
     }
     
     static func attributedText(from encodedText: String?) -> NSAttributedString? {
@@ -154,7 +156,7 @@ extension Item {
         guard let str = encodedText else {
             return nil
         }
-        
+
         guard let data = str.data(using: .utf8) else {
             return nil
         }
@@ -175,6 +177,8 @@ extension Item {
         if attributedString.string.hasSuffix("\n") {
             attributedString.deleteCharacters(in: NSMakeRange(attributedString.length-1, 1))
         }
+        
+
         
         return attributedString
     }
