@@ -77,7 +77,7 @@ class Item : Identifiable {
         
         attributedText = Item.attributedText(from: text)
         attributedLink = Item.attributedLink(from: url, text: Item.urlWithoutProtocol(url ?? ""))
-        attributedHNLink = Item.attributedLink(from: "https://news.ycombinator.com/item?id=\(id)", text: "HN", font: UIFont.systemFont(ofSize: UIFont.smallSystemFontSize))
+        attributedHNLink = Item.attributedLink(from: "https://news.ycombinator.com/item?id=\(id)", text: "HN", font: Fonts.caption.uiFont)
     }
     
     convenience init?(jsonItem: JsonItem) {
@@ -138,7 +138,7 @@ extension Item {
         else { return Strings.commentsFormat.localizedStringWithFormat(Int(comments)) }
     }
     
-    static func attributedLink(from url: String?, text: String, font: UIFont = UIFont.systemFont(ofSize: UIFont.labelFontSize)) -> NSAttributedString? {
+    static func attributedLink(from url: String?, text: String, font: UIFont = Fonts.body.uiFont) -> NSAttributedString? {
         
         guard let url = url else {
             return nil
@@ -171,7 +171,7 @@ extension Item {
         }
         
         attributedString.addAttribute(NSAttributedString.Key.font,
-                                      value: UIFont.systemFont(ofSize: UIFont.labelFontSize),
+                                      value: Fonts.body.uiFont,
                                       range: NSMakeRange(0, attributedString.length))
         
         if attributedString.string.hasSuffix("\n") {

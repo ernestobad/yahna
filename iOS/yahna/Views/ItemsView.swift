@@ -19,16 +19,14 @@ struct ItemsView: View {
                     List(self.viewModel.items) { (item) in
                         ItemCellView(item: item,
                                      availableWidth: geometry.size.width)
-                            .padding(.bottom, -12)
+                            .padding(.bottom, -10)
                     }
                     .padding(.leading, -20)
                     .padding(.trailing, -40)
-                    .navigationBarTitle(Text(self.viewModel.parentId.title ?? "")
-                    .font(Fonts.largeTitle.font))
+                    .navigationBarTitle(Text(self.viewModel.parentId.title ?? ""))
                 }
             }
         }.onAppear {
-            UITableView.appearance().separatorColor = .clear
             DataProvider.shared.refreshViewModel(self.viewModel)
         }
     }
