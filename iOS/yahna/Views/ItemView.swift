@@ -25,14 +25,14 @@ struct ItemView: View {
                     self.titleSection
                     if !(self.item.url?.isEmpty ?? true) {
                         TextView(attributedText: self.item.attributedLink,
-                                 availableWidth: geometry.size.width - 32,
+                                 availableWidth: geometry.size.width - 24,
                                  maximumNumberOfLines: 1,
                                  lineBreakMode: .byTruncatingTail)
                     }
                     self.bySection
                     if !(self.item.text?.isEmpty ?? true) {
                         TextView(attributedText: self.item.attributedText,
-                                 availableWidth: geometry.size.width-32)
+                                 availableWidth: geometry.size.width-24)
                     }
                     self.footer
                     Divider()
@@ -42,12 +42,12 @@ struct ItemView: View {
                             ForEach(self.item.kids) { item in
                                 CommentView(item: item,
                                             depth: 0,
-                                            availableWidth: geometry.size.width-32)
+                                            availableWidth: geometry.size.width-24)
                             }
                         }
                     }
                     
-                }.padding(.horizontal, 16)
+                }.padding(.horizontal, 12)
                 
                 Rectangle()
                     .fill(Color.clear)
@@ -72,7 +72,7 @@ struct ItemView: View {
     
     var bySection: some View {
         HStack(spacing: 0) {
-            Text(verbatim: "@\(item.by ?? "")")
+            Text(verbatim: item.by ?? "")
                 .foregroundColor(Color(UIColor.systemGray))
                 .font(Fonts.caption.font)
             Text(verbatim: "・")

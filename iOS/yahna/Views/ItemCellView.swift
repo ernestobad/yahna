@@ -32,7 +32,7 @@ struct ItemCellView: View {
     
     var bySection: some View {
         HStack(spacing: 0) {
-            Text(verbatim: "@\(item.by ?? "")")
+            Text(verbatim: item.by ?? "")
                 .foregroundColor(Color(UIColor.systemGray))
                 .font(Fonts.caption.font)
             Text(verbatim: "・")
