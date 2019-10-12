@@ -48,7 +48,8 @@ struct HomeView: View {
                     Image(systemName: "briefcase")
                     Text("Jobs")
             }
-        }.onAppear {
+        }.edgesIgnoringSafeArea(.top)
+        .onAppear {
             UINavigationBar.appearance().largeTitleTextAttributes = [.font : Fonts.largeTitle.uiFont]
             UINavigationBar.appearance().titleTextAttributes = [.font : Fonts.title.uiFont]
             UITableView.appearance().separatorColor = .clear
