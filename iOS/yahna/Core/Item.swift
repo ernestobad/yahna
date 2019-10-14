@@ -17,7 +17,7 @@ enum ItemType: String {
     case pollopt
 }
 
-class Item : Identifiable {
+class Item : Identifiable, Hashable {
     
     let id: Int64
     let deleted: Bool
@@ -121,6 +121,14 @@ class Item : Identifiable {
         }
         self.descendantsCount = Int64(count)
         return count
+    }
+    
+    func hash(into hasher: inout Hasher) {
+        hasher.combine(id)
+    }
+    
+    static func == (lhs: Item, rhs: Item) -> Bool {
+        return lhs.id == rhs.id
     }
 }
 

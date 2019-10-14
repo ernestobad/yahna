@@ -16,7 +16,7 @@ struct ItemsView: View {
         NavigationView {
             StatesView(viewModel: viewModel, error: { DefaultErrorView() }, empty: { DefaultEmptyView() }) {
                 GeometryReader { geometry in
-                    List(self.viewModel.items) { (item) in
+                    CollectionView(self.viewModel.items, estimatedItemSize: CGSize(width: geometry.size.width, height: 38.3)) { (item) in
                         ItemCellView(item: item,
                                      availableWidth: geometry.size.width)
                             .padding(.bottom, -10)
