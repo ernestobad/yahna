@@ -16,13 +16,10 @@ struct ItemsView: View {
         NavigationView {
             StatesView(viewModel: viewModel, error: { DefaultErrorView() }, empty: { DefaultEmptyView() }) {
                 GeometryReader { geometry in
-                    CollectionView(self.viewModel.items, estimatedItemSize: CGSize(width: geometry.size.width, height: 38.3)) { (item) in
+                    CollectionView(self.viewModel.items, estimatedItemSize: CGSize(width: geometry.size.width, height: 400)) { (item) in
                         ItemCellView(item: item,
                                      availableWidth: geometry.size.width)
-                            .padding(.bottom, -10)
                     }
-                    .padding(.leading, -20)
-                    .padding(.trailing, -40)
                     .navigationBarTitle(Text(self.viewModel.parentId.title ?? ""))
                 }
             }

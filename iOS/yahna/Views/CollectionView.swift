@@ -49,6 +49,8 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         self.cellContent = cellContent
         let layout = UICollectionViewFlowLayout()
         layout.estimatedItemSize = estimatedItemSize
+        layout.minimumInteritemSpacing = 0
+        layout.minimumLineSpacing = 0
         super.init(collectionViewLayout: layout)
     }
     
@@ -60,12 +62,11 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         var snapshot = NSDiffableDataSourceSnapshot<MyCollectionViewSection, Data.Element>()
         snapshot.appendSections([.section])
         snapshot.appendItems(Array(data), toSection: .section)
-        dataSource.apply(snapshot, animatingDifferences: true)
+        dataSource.apply(snapshot, animatingDifferences: false)
     }
     
     override func viewDidLoad() {
         
-        view.backgroundColor = UIColor.clear
         collectionView.backgroundColor = UIColor.clear
         
         collectionView.register(MyCollectionViewCell<CellContent>.classForCoder(),
@@ -98,6 +99,8 @@ class MyCollectionViewCell<CellContent : View> : UICollectionViewCell {
     
     var hostingController: UIHostingController<AnyView> = UIHostingController<AnyView>(rootView: AnyView(EmptyView()))
     
+    var _preferredSize: CGSize?
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
     }
@@ -106,31 +109,47 @@ class MyCollectionViewCell<CellContent : View> : UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    var preferredSize: CGSize {
+        if let size = _preferredSize {
+            return size
+        } else {
+            let size = hostingController.sizeThatFits(in: CGSize(width: contentView.frame.size.width,
+                                                                 height: CGFloat.greatestFiniteMagnitude))
+            _preferredSize = size
+            return size
+        }
+    }
+    
     func setUp(content: CellContent) {
         hostingController.rootView = AnyView(content)
+        _preferredSize = nil
     }
     
     func moveHostingControllerToParentViewController(_ parentViewController: UIViewController) {
         parentViewController.addChild(hostingController)
         hostingController.didMove(toParent: parentViewController)
-        hostingController.view.frame = contentView.bounds
+        hostingController.view.frame = CGRect(origin: contentView.bounds.origin, size: preferredSize)
         contentView.addSubview(hostingController.view)
     }
     
     func removeViewControllerFromParentViewController() {
-        hostingController.view.removeFromSuperview()
-        hostingController.willMove(toParent: nil)
-        hostingController.removeFromParent()
+        if hostingController.view.superview != nil {
+            hostingController.view.removeFromSuperview()
+            hostingController.willMove(toParent: nil)
+            hostingController.removeFromParent()
+        }
     }
     
     override func prepareForReuse() {
+        super.prepareForReuse()
+        removeViewControllerFromParentViewController()
         hostingController.rootView = AnyView(EmptyView())
+        _preferredSize = nil
     }
     
     override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
-        let size = hostingController.sizeThatFits(in: CGSize(width: layoutAttributes.size.width,
-                                                             height: CGFloat.greatestFiniteMagnitude))
-        layoutAttributes.size = size
-        return layoutAttributes
+        let attributes = super.preferredLayoutAttributesFitting(layoutAttributes)
+        attributes.size = preferredSize
+        return attributes
     }
 }
