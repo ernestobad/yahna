@@ -47,8 +47,6 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     let cellContent: (Data.Element) -> CellContent
     
-    var viewControllersDict = [Data.Element.ID: UIHostingController<AnyView>]()
-    
     private let cellReuseIdentifier = "MyCollectionViewControllerCell"
     
     public init(cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
@@ -69,8 +67,7 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         var snapshot = NSDiffableDataSourceSnapshot<MyCollectionViewSection, Data.Element>()
         snapshot.appendSections([.section])
         snapshot.appendItems(Array(data), toSection: .section)
-        setupChildViewControllers(data: data)
-        dataSource.apply(snapshot, animatingDifferences: false)
+        dataSource.apply(snapshot, animatingDifferences: true)
     }
     
     override func viewDidLoad() {
@@ -86,40 +83,15 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.cellReuseIdentifier,
                                                           for: indexPath) as! MyCollectionViewCell<CellContent>
             
-            if let vc = self.viewControllersDict[element.id] {
-                cell.setUp(content: vc.view)
-            }
+            cell.setUp(content: self.cellContent(element))
             
             return cell
         }
     }
     
-    private func setupChildViewControllers(data: Data) {
-        
-        var idsToDelete = Set<Data.Element.ID>(viewControllersDict.keys)
-        
-        for element in data {
-            idsToDelete.remove(element.id)
-            if let existingViewController = viewControllersDict[element.id] {
-                let view = cellContent(element)
-                existingViewController.rootView = AnyView(view)
-            } else {
-                let view = cellContent(element)
-                let newVC = UIHostingController(rootView: AnyView(view))
-                viewControllersDict[element.id] = newVC
-                addChild(newVC)
-                newVC.didMove(toParent: self)
-            }
-        }
-        
-        for id in idsToDelete {
-            if let vc = viewControllersDict[id] {
-                vc.viewIfLoaded?.removeFromSuperview()
-                vc.willMove(toParent: nil)
-                vc.removeFromParent()
-                viewControllersDict.removeValue(forKey: id)
-            }
-        }
+
+    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
+        (cell as? MyCollectionViewCell<CellContent>)?.moveHostingControllerToParentViewController(self)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -137,7 +109,7 @@ enum MyCollectionViewSection : Hashable {
 
 class MyCollectionViewCell<CellContent : View> : UICollectionViewCell {
     
-    var subview: UIView?
+    var hostingController: UIHostingController<AnyView> = UIHostingController<AnyView>(rootView: AnyView(EmptyView()))
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -147,25 +119,24 @@ class MyCollectionViewCell<CellContent : View> : UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func setUp(content: UIView) {
-        
-        if let subview = self.subview {
-            subview.removeFromSuperview()
+    func setUp(content: CellContent) {
+        hostingController.rootView = AnyView(content)
+    }
+    
+    func moveHostingControllerToParentViewController(_ parentViewController: UIViewController) {
+        guard hostingController.parent == nil else {
+            return
         }
-        
-        content.removeFromSuperview()
-        subview = content
-        
-        content.frame = self.contentView.bounds
-        content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
-        self.contentView.addSubview(content)
+        parentViewController.addChild(hostingController)
+        hostingController.didMove(toParent: parentViewController)
+        hostingController.view.frame = contentView.bounds
+        hostingController.view.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        contentView.addSubview(hostingController.view)
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        if let subview = self.subview {
-            subview.removeFromSuperview()
-        }
-        subview = nil
+        hostingController.rootView = AnyView(EmptyView())
     }
+    
 }
