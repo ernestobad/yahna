@@ -15,18 +15,18 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     
     let cellContent: (Data.Element) -> CellContent
     
-    let estimatedItemSize: CGSize
+    //let estimatedItemSize: CGSize
     
     public init(_ data: Data, estimatedItemSize: CGSize, @ViewBuilder cellContent: @escaping (Data.Element) -> CellContent) {
         self.data = data
-        self.estimatedItemSize = estimatedItemSize
+        //self.estimatedItemSize = estimatedItemSize
         self.cellContent = cellContent
     }
     
     typealias UIViewControllerType = MyCollectionViewController
     
     func makeUIViewController(context: UIViewControllerRepresentableContext<CollectionView>) -> MyCollectionViewController<Data, CellContent> {
-        let vc = MyCollectionViewController<Data, CellContent>(estimatedItemSize: estimatedItemSize, cellContent: cellContent)
+        let vc = MyCollectionViewController<Data, CellContent>(cellContent: cellContent)
         return vc
     }
     
@@ -45,10 +45,9 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     private let cellReuseIdentifier = "MyCollectionViewControllerCell"
     
-    public init(estimatedItemSize: CGSize, cellContent: @escaping (Data.Element) -> CellContent) {
+    public init(cellContent: @escaping (Data.Element) -> CellContent) {
         self.cellContent = cellContent
         let layout = UICollectionViewFlowLayout()
-        layout.estimatedItemSize = estimatedItemSize
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
         super.init(collectionViewLayout: layout)
@@ -88,6 +87,24 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         (cell as? MyCollectionViewCell<CellContent>)?.removeViewControllerFromParentViewController()
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        let width = collectionView.frame.size.width
+        let titleHeight: CGFloat
+        if let title = (dataSource.itemIdentifier(for: indexPath) as? Item)?.title {
+            let attributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: Fonts.title.uiFont]
+            titleHeight = (title as NSString).boundingRect(with: CGSize(width: width, height: CGFloat.greatestFiniteMagnitude),
+                                                           options: NSStringDrawingOptions.usesLineFragmentOrigin,
+                                                           attributes: attributes,
+                                                           context: nil).size.height
+        } else {
+            titleHeight = 0
+        }
+        
+        let height: CGFloat = 8.0 + 17.0 + 8.0 + titleHeight + 8.0 + 19.3 + 8 + 17 + 8 + 0.4
+        return CGSize(width: width, height: height)
     }
 }
 
