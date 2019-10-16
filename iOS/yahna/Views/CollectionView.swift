@@ -35,6 +35,13 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     }
 }
 
+//class PrefetchingDiffableDataSource<Data> : UICollectionViewDiffableDataSource<MyCollectionViewSection, Data.Element>, UICollectionViewDataSourcePrefetching where Data : RandomAccessCollection,Data.Element : Hashable & Identifiable {
+//    
+//    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
+//        <#code#>
+//    }
+//}
+
 class MyCollectionViewController<Data, CellContent> : UICollectionViewController, UICollectionViewDelegateFlowLayout where Data : RandomAccessCollection, CellContent : View, Data.Element : Hashable & Identifiable {
     
     var dataSource: UICollectionViewDiffableDataSource<MyCollectionViewSection, Data.Element>!
@@ -42,6 +49,8 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     var data: Data?
     
     let cellContent: (Data.Element) -> CellContent
+    
+    var viewControllersDict = [Data.Element.ID: UIHostingController<AnyView>]()
     
     private let cellReuseIdentifier = "MyCollectionViewControllerCell"
     
@@ -61,6 +70,7 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         var snapshot = NSDiffableDataSourceSnapshot<MyCollectionViewSection, Data.Element>()
         snapshot.appendSections([.section])
         snapshot.appendItems(Array(data), toSection: .section)
+        setupChildViewControllers(data: data)
         dataSource.apply(snapshot, animatingDifferences: false)
     }
     
@@ -76,35 +86,49 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
             
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: self.cellReuseIdentifier,
                                                           for: indexPath) as! MyCollectionViewCell<CellContent>
-            cell.setUp(content: self.cellContent(element))
+            
+            if let vc = self.viewControllersDict[element.id] {
+                cell.setUp(content: vc.view)
+            }
+            
             return cell
         }
     }
     
-    override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as? MyCollectionViewCell<CellContent>)?.moveHostingControllerToParentViewController(self)
-    }
-    
-    override func collectionView(_ collectionView: UICollectionView, didEndDisplaying cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
-        (cell as? MyCollectionViewCell<CellContent>)?.removeViewControllerFromParentViewController()
+    private func setupChildViewControllers(data: Data) {
+        
+        var idsToDelete = Set<Data.Element.ID>(viewControllersDict.keys)
+        
+        for element in data {
+            idsToDelete.remove(element.id)
+            if let existingViewController = viewControllersDict[element.id] {
+                let view = cellContent(element)
+                existingViewController.rootView = AnyView(view)
+            } else {
+                let view = cellContent(element)
+                let newVC = UIHostingController(rootView: AnyView(view))
+                viewControllersDict[element.id] = newVC
+                addChild(newVC)
+                newVC.didMove(toParent: self)
+            }
+        }
+        
+        for id in idsToDelete {
+            if let vc = viewControllersDict[id] {
+                vc.view.removeFromSuperview()
+                vc.willMove(toParent: nil)
+                vc.removeFromParent()
+                viewControllersDict.removeValue(forKey: id)
+            }
+        }
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        
-        let width = collectionView.frame.size.width
-        let titleHeight: CGFloat
-        if let title = (dataSource.itemIdentifier(for: indexPath) as? Item)?.title {
-            let attributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: Fonts.title.uiFont]
-            titleHeight = (title as NSString).boundingRect(with: CGSize(width: width, height: CGFloat.greatestFiniteMagnitude),
-                                                           options: NSStringDrawingOptions.usesLineFragmentOrigin,
-                                                           attributes: attributes,
-                                                           context: nil).size.height
+        if let element = dataSource.itemIdentifier(for: indexPath), let vc = viewControllersDict[element.id] {
+            return vc.sizeThatFits(in: CGSize(width: collectionView.frame.width, height: .greatestFiniteMagnitude))
         } else {
-            titleHeight = 0
+            return .zero
         }
-        
-        let height: CGFloat = 8.0 + 17.0 + 8.0 + titleHeight + 8.0 + 19.3 + 8 + 17 + 8 + 0.4
-        return CGSize(width: width, height: height)
     }
 }
 
@@ -114,9 +138,7 @@ enum MyCollectionViewSection : Hashable {
 
 class MyCollectionViewCell<CellContent : View> : UICollectionViewCell {
     
-    var hostingController: UIHostingController<AnyView> = UIHostingController<AnyView>(rootView: AnyView(EmptyView()))
-    
-    var _preferredSize: CGSize?
+    var subview: UIView?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -126,47 +148,24 @@ class MyCollectionViewCell<CellContent : View> : UICollectionViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
-    var preferredSize: CGSize {
-        if let size = _preferredSize {
-            return size
-        } else {
-            let size = hostingController.sizeThatFits(in: CGSize(width: contentView.frame.size.width,
-                                                                 height: CGFloat.greatestFiniteMagnitude))
-            _preferredSize = size
-            return size
+    func setUp(content: UIView) {
+        
+        if let subview = self.subview {
+            subview.removeFromSuperview()
         }
-    }
-    
-    func setUp(content: CellContent) {
-        hostingController.rootView = AnyView(content)
-        _preferredSize = nil
-    }
-    
-    func moveHostingControllerToParentViewController(_ parentViewController: UIViewController) {
-        parentViewController.addChild(hostingController)
-        hostingController.didMove(toParent: parentViewController)
-        hostingController.view.frame = CGRect(origin: contentView.bounds.origin, size: preferredSize)
-        contentView.addSubview(hostingController.view)
-    }
-    
-    func removeViewControllerFromParentViewController() {
-        if hostingController.view.superview != nil {
-            hostingController.view.removeFromSuperview()
-            hostingController.willMove(toParent: nil)
-            hostingController.removeFromParent()
-        }
+        
+        subview = content
+        
+        content.frame = self.contentView.bounds
+        content.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        self.contentView.addSubview(content)
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        removeViewControllerFromParentViewController()
-        hostingController.rootView = AnyView(EmptyView())
-        _preferredSize = nil
-    }
-    
-    override func preferredLayoutAttributesFitting(_ layoutAttributes: UICollectionViewLayoutAttributes) -> UICollectionViewLayoutAttributes {
-        let attributes = super.preferredLayoutAttributesFitting(layoutAttributes)
-        attributes.size = preferredSize
-        return attributes
+        if let subview = self.subview {
+            subview.removeFromSuperview()
+        }
+        subview = nil
     }
 }
