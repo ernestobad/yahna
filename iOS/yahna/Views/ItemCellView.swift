@@ -74,6 +74,23 @@ struct ItemCellView: View {
             
         }.fixedSize(horizontal: false, vertical: true)
     }
+        
+    static func calcCellSize(_ item: Item, _ availableWidth: CGFloat) -> CGSize {
+        let titleHeight: CGFloat
+        if let title = item.title {
+            let attributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: Fonts.title.uiFont]
+            titleHeight = (title as NSString).boundingRect(with: CGSize(width: availableWidth - 32,
+                                                                        height: CGFloat.greatestFiniteMagnitude),
+                                                           options: NSStringDrawingOptions.usesLineFragmentOrigin,
+                                                           attributes: attributes,
+                                                           context: nil).size.height
+        } else {
+            titleHeight = 0
+        }
+        
+        let height: CGFloat = 8.0 + 17.0 + 8.0 + titleHeight + 8.0 + 19.3 + 8 + 17 + 8 + 0.4
+        return CGSize(width: availableWidth, height: height) // 38.3
+    }
 }
 
 struct ItemCellView_Previews: PreviewProvider {

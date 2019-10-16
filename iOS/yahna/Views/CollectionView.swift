@@ -15,18 +15,20 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     
     let cellContent: (Data.Element) -> CellContent
     
-    //let estimatedItemSize: CGSize
+    let cellSize: (Data.Element, CGFloat) -> CGSize
     
-    public init(_ data: Data, estimatedItemSize: CGSize, @ViewBuilder cellContent: @escaping (Data.Element) -> CellContent) {
+    public init(_ data: Data,
+                cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
+                @ViewBuilder cellContent: @escaping (Data.Element) -> CellContent) {
         self.data = data
-        //self.estimatedItemSize = estimatedItemSize
         self.cellContent = cellContent
+        self.cellSize = cellSize
     }
     
     typealias UIViewControllerType = MyCollectionViewController
     
     func makeUIViewController(context: UIViewControllerRepresentableContext<CollectionView>) -> MyCollectionViewController<Data, CellContent> {
-        let vc = MyCollectionViewController<Data, CellContent>(cellContent: cellContent)
+        let vc = MyCollectionViewController<Data, CellContent>(cellSize: cellSize, cellContent: cellContent)
         return vc
     }
     
@@ -35,18 +37,13 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     }
 }
 
-//class PrefetchingDiffableDataSource<Data> : UICollectionViewDiffableDataSource<MyCollectionViewSection, Data.Element>, UICollectionViewDataSourcePrefetching where Data : RandomAccessCollection,Data.Element : Hashable & Identifiable {
-//    
-//    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-//        <#code#>
-//    }
-//}
-
 class MyCollectionViewController<Data, CellContent> : UICollectionViewController, UICollectionViewDelegateFlowLayout where Data : RandomAccessCollection, CellContent : View, Data.Element : Hashable & Identifiable {
     
     var dataSource: UICollectionViewDiffableDataSource<MyCollectionViewSection, Data.Element>!
     
     var data: Data?
+    
+    let cellSize: (Data.Element, CGFloat) -> CGSize
     
     let cellContent: (Data.Element) -> CellContent
     
@@ -54,7 +51,9 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     private let cellReuseIdentifier = "MyCollectionViewControllerCell"
     
-    public init(cellContent: @escaping (Data.Element) -> CellContent) {
+    public init(cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
+                cellContent: @escaping (Data.Element) -> CellContent) {
+        self.cellSize = cellSize
         self.cellContent = cellContent
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
@@ -115,7 +114,7 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         
         for id in idsToDelete {
             if let vc = viewControllersDict[id] {
-                vc.view.removeFromSuperview()
+                vc.viewIfLoaded?.removeFromSuperview()
                 vc.willMove(toParent: nil)
                 vc.removeFromParent()
                 viewControllersDict.removeValue(forKey: id)
@@ -124,8 +123,8 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        if let element = dataSource.itemIdentifier(for: indexPath), let vc = viewControllersDict[element.id] {
-            return vc.sizeThatFits(in: CGSize(width: collectionView.frame.width, height: .greatestFiniteMagnitude))
+        if let element = dataSource.itemIdentifier(for: indexPath) {
+            return cellSize(element, collectionView.frame.width)
         } else {
             return .zero
         }
@@ -154,6 +153,7 @@ class MyCollectionViewCell<CellContent : View> : UICollectionViewCell {
             subview.removeFromSuperview()
         }
         
+        content.removeFromSuperview()
         subview = content
         
         content.frame = self.contentView.bounds

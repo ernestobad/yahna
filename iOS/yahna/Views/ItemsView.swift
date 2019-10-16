@@ -16,7 +16,7 @@ struct ItemsView: View {
         NavigationView {
             StatesView(viewModel: viewModel, error: { DefaultErrorView() }, empty: { DefaultEmptyView() }) {
                 GeometryReader { geometry in
-                    CollectionView(self.viewModel.items, estimatedItemSize: CGSize(width: geometry.size.width, height: 400)) { (item) in
+                    CollectionView(self.viewModel.items, cellSize: ItemCellView.calcCellSize) { (item) in
                         ItemCellView(item: item,
                                      availableWidth: geometry.size.width)
                     }
