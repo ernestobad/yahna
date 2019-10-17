@@ -13,14 +13,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         
-        do {
-            try DatabaseManager.shared.createDB()
-        } catch {
-            Log.logger.error("Error creationg the DB: \(error)")
-            return false
-        }
+//        do {
+//            try DatabaseManager.shared.createDB()
+//        } catch {
+//            Log.logger.error("Error creationg the DB: \(error)")
+//            return false
+//        }
         
-        // Override point for customization after application launch.
         return true
     }
 
