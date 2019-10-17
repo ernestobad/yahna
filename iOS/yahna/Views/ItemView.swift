@@ -47,14 +47,14 @@ struct ItemView: View {
                         }
                     }
                     
-                }.padding(.horizontal, 12)
+                }
+                .padding(.top, 12)
+                .padding(.horizontal, 12)
                 
-                Rectangle()
-                    .fill(Color.clear)
+                Rectangle().fill(Color.clear)
             }
-            .padding(.top, -35)
-                .onAppear {
-                    DataProvider.shared.refreshViewModel(self.viewModel)
+            .onAppear {
+                DataProvider.shared.refreshViewModel(self.viewModel)
             }
         }
     }

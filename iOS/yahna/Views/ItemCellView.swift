@@ -17,79 +17,79 @@ struct ItemCellView: View {
     @ObservedObject var webViewState = WebViewState()
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            bySection.padding(.horizontal, 16)
-            NavigationLink(destination: ItemView(viewModel: ItemViewModel(item))) {
-                titleSection.padding(.horizontal, 16)
-            }
-            if item.url != nil {
-                linkSection.padding(.horizontal, 16)
-            }
-            footerSection.padding(.horizontal, 16)
-            Divider()
-        }.padding(.top, 8)
+        NavigationLink(destination: ItemView(viewModel: ItemViewModel(item))) {
+            VStack(alignment: .leading, spacing: 8) {
+                VStack(alignment: .leading, spacing: 8) {
+                    bySection
+                    titleSection
+                    if item.url != nil { linkSection }
+                    footerSection
+                }.padding(.horizontal, 12)
+                Divider()
+            }.padding(.top, 8)
+        }
     }
     
     var bySection: some View {
         HStack(spacing: 0) {
             Text(verbatim: item.by ?? "")
-                .foregroundColor(Color(UIColor.systemGray))
-                .font(Fonts.caption.font)
             Text(verbatim: "・")
-                .foregroundColor(Color(UIColor.systemGray))
-                .font(Fonts.caption.font)
             Text(verbatim: item.time.toTimeString())
-                .foregroundColor(Color(UIColor.systemGray))
-                .font(Fonts.caption.font)
-        }.fixedSize(horizontal: false, vertical: true)
+        }
+        .foregroundColor(Color(UIColor.systemGray))
+        .font(Fonts.caption.font)
+        .fixedSize(horizontal: false, vertical: true)
     }
     
     var titleSection: some View {
         Text(verbatim: item.title ?? "")
             .font(Fonts.body.font)
+            .foregroundColor(Color.init(UIColor.label))
             .lineLimit(nil)
     }
     
     var linkSection: some View {
         TextView(attributedText: item.attributedLink,
-                 availableWidth: availableWidth - 32,
+                 availableWidth: availableWidth - 12*2,
                  maximumNumberOfLines: 1,
                  lineBreakMode: .byTruncatingTail)
     }
     
     var footerSection: some View {
         HStack(spacing:4) {
-            
             Text(verbatim: item.pointsString)
-                .foregroundColor(Color(UIColor.systemGray))
-                .font(Fonts.caption.font)
-            
             Text(verbatim: "・")
-                .foregroundColor(Color(UIColor.systemGray2))
-                .font(Fonts.caption.font)
-            
             Text(verbatim: item.commentsString)
-                .foregroundColor(Color(UIColor.systemGray))
-                .font(Fonts.caption.font)
-            
-        }.fixedSize(horizontal: false, vertical: true)
+        }
+        .foregroundColor(Color(UIColor.systemGray))
+        .font(Fonts.caption.font)
+        .fixedSize(horizontal: false, vertical: true)
     }
         
     static func calcCellSize(_ item: Item, _ availableWidth: CGFloat) -> CGSize {
-        let titleHeight: CGFloat
+        
+        let titleSectionHeight: CGFloat
         if let title = item.title {
             let attributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: Fonts.title.uiFont]
-            titleHeight = (title as NSString).boundingRect(with: CGSize(width: availableWidth - 32,
+            titleSectionHeight = (title as NSString).boundingRect(with: CGSize(width: availableWidth - 12*2,
                                                                         height: CGFloat.greatestFiniteMagnitude),
                                                            options: NSStringDrawingOptions.usesLineFragmentOrigin,
                                                            attributes: attributes,
                                                            context: nil).size.height
         } else {
-            titleHeight = 0
+            titleSectionHeight = 0
         }
         
-        let height: CGFloat = 8.0 + 17.0 + 8.0 + titleHeight + 8.0 + 19.3 + 8 + 17 + 8 + 0.4
-        return CGSize(width: availableWidth, height: height) // 38.3
+        let vSpacing: CGFloat = 8
+        let bySectionHeight: CGFloat = 17.0
+        let linkSectionHeight: CGFloat = 19.3
+        let footerSectionHeight: CGFloat = 17
+        let separatorHeight: CGFloat = 1
+        
+        let height: CGFloat =
+            vSpacing + bySectionHeight + vSpacing + titleSectionHeight + (item.url != nil ? vSpacing + linkSectionHeight : 0) + vSpacing + footerSectionHeight + vSpacing + separatorHeight
+        
+        return CGSize(width: availableWidth, height: height)
     }
 }
 

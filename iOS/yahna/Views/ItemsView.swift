@@ -20,7 +20,7 @@ struct ItemsView: View {
                         ItemCellView(item: item,
                                      availableWidth: geometry.size.width)
                     }
-                    .navigationBarTitle(Text(self.viewModel.parentId.title ?? ""))
+                    .navigationBarTitle(Text(self.viewModel.parentId.title ?? ""), displayMode: NavigationBarItem.TitleDisplayMode.inline)
                 }
             }
         }.onAppear {
