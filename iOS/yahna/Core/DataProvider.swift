@@ -17,10 +17,46 @@ class DataProvider {
     
     public static let shared = DataProvider()
     
+    let topStories = ItemsViewModel(.topStories)
+    let newStories = ItemsViewModel(.newStories)
+    let askStories = ItemsViewModel(.askStories)
+    let showStories = ItemsViewModel(.showStories)
+    let jobStories = ItemsViewModel(.jobStories)
+    
+    private var itemsViewModelsCache: NSCache<NSNumber, ItemViewModel> = {
+        let cache = NSCache<NSNumber, ItemViewModel>()
+        cache.countLimit = 100
+        return cache
+    }()
+    
+    public func itemViewModel(_ item: Item) -> ItemViewModel {
+        if let vm = itemsViewModelsCache.object(forKey: item.id as NSNumber) {
+            return vm
+        } else {
+            let vm = ItemViewModel(item)
+            itemsViewModelsCache.setObject(vm, forKey: item.id as NSNumber)
+            return vm
+        }
+    }
+    
     @discardableResult
-    public func refreshViewModel<T : RefreshableViewModel>(_ viewModel: T) -> Cancellable {
+    public func refreshViewModel<T : RefreshableViewModel>(_ viewModel: T, force: Bool = false) -> AnyPublisher<T, Never> {
         
-        DispatchQueue.main.async { viewModel.onRefreshStarted() }
+        assert(Thread.isMainThread)
+        
+        if !force,
+            viewModel.state.error == nil,
+            let lastRefreshTime = viewModel.lastRefreshTime,
+            Date().timeIntervalSince(lastRefreshTime) < TimeInterval(120) {
+            return Just(viewModel).eraseToAnyPublisher()
+        }
+        
+        if !force,
+            viewModel.state.isRefreshing {
+            return Just(viewModel).eraseToAnyPublisher()
+        }
+        
+        viewModel.onRefreshStarted()
         
         let combinedPublisher: AnyPublisher<(Item?, [Item]), Error>
                 
@@ -46,7 +82,8 @@ class DataProvider {
         
         var result: [Item]?
         
-        return combinedPublisher
+        
+        let finalPublisher = combinedPublisher
             .map({ (parent, items) -> [Item] in
                 if let parent = parent {
                     var idToItemMap = [Int64: Item]()
@@ -62,17 +99,22 @@ class DataProvider {
                 } else {
                     return items
                 }
-            })
-            .receive(on: RunLoop.main)
-            .sink(receiveCompletion: { completion in
-                switch completion {
-                case .finished:
-                    viewModel.onRefreshCompleted(result, error: nil)
-                case .failure(let anError):
-                    viewModel.onRefreshCompleted(result, error: anError)
-                }
-            }, receiveValue: { refreshResult in
-                result = refreshResult
-            })
+            }).receive(on: RunLoop.main)
+            
+        
+        return Future<T, Never> { promise in
+            _ = finalPublisher
+                .sink(receiveCompletion: { completion in
+                    switch completion {
+                    case .finished:
+                        viewModel.onRefreshCompleted(result, error: nil)
+                    case .failure(let anError):
+                        viewModel.onRefreshCompleted(result, error: anError)
+                    }
+                    promise(.success(viewModel))
+                }, receiveValue: { refreshResult in
+                    result = refreshResult
+                })
+        }.eraseToAnyPublisher()
     }
 }

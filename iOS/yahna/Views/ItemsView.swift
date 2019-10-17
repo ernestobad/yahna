@@ -16,7 +16,9 @@ struct ItemsView: View {
         NavigationView {
             StatesView(viewModel: viewModel, error: { DefaultErrorView() }, empty: { DefaultEmptyView() }) {
                 GeometryReader { geometry in
-                    CollectionView(self.viewModel.items, cellSize: ItemCellView.calcCellSize) { (item) in
+                    CollectionView(self.viewModel.items,
+                                   refresh: { DataProvider.shared.refreshViewModel(self.viewModel, force: true).map({ _ -> Void in }).eraseToAnyPublisher() },
+                                   cellSize: ItemCellView.calcCellSize) { (item) in
                         ItemCellView(item: item,
                                      availableWidth: geometry.size.width)
                     }

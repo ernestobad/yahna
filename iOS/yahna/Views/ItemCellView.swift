@@ -17,7 +17,7 @@ struct ItemCellView: View {
     @ObservedObject var webViewState = WebViewState()
     
     var body: some View {
-        NavigationLink(destination: ItemView(viewModel: ItemViewModel(item))) {
+        NavigationLink(destination: ItemView(viewModel: DataProvider.shared.itemViewModel(item))) {
             VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading, spacing: 8) {
                     bySection

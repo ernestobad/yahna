@@ -23,6 +23,8 @@ protocol RefreshableViewModel : ObservableObject {
     
     var isEmpty: Bool { get }
     
+    var lastRefreshTime: Date? { get }
+    
     func onRefreshStarted()
     
     func onRefreshCompleted(_ result: [Item]?, error: Error?)
@@ -36,6 +38,8 @@ class RefreshableViewModelBase : RefreshableViewModel {
     
     var isEmpty: Bool { return true }
     
+    var lastRefreshTime: Date?
+    
     init(_ parentId: ParentId) {
         self.parentId = parentId
     }
@@ -46,6 +50,7 @@ class RefreshableViewModelBase : RefreshableViewModel {
     
     func onRefreshCompleted(_ result: [Item]?, error: Error?) {
         self.state = ViewState(isRefreshing: false, error: error)
+        self.lastRefreshTime = Date()
     }
 }
 

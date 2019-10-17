@@ -8,6 +8,7 @@
 
 import Foundation
 import SwiftUI
+import Combine
 
 struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where Data : RandomAccessCollection, CellContent : View, Data.Element : Hashable & Identifiable {
     
@@ -17,10 +18,14 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     
     let cellSize: (Data.Element, CGFloat) -> CGSize
     
+    let refresh: (() -> AnyPublisher<Void, Never>)?
+    
     public init(_ data: Data,
+                refresh:  (() -> AnyPublisher<Void, Never>)? = nil,
                 cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
                 @ViewBuilder cellContent: @escaping (Data.Element) -> CellContent) {
         self.data = data
+        self.refresh = refresh
         self.cellContent = cellContent
         self.cellSize = cellSize
     }
@@ -28,7 +33,7 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     typealias UIViewControllerType = MyCollectionViewController
     
     func makeUIViewController(context: UIViewControllerRepresentableContext<CollectionView>) -> MyCollectionViewController<Data, CellContent> {
-        let vc = MyCollectionViewController<Data, CellContent>(cellSize: cellSize, cellContent: cellContent)
+        let vc = MyCollectionViewController<Data, CellContent>(refresh: refresh, cellSize: cellSize, cellContent: cellContent)
         return vc
     }
     
@@ -47,10 +52,16 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     let cellContent: (Data.Element) -> CellContent
     
+    let refresh: (() -> AnyPublisher<Void, Never>)?
+    
     private let cellReuseIdentifier = "MyCollectionViewControllerCell"
     
-    public init(cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
+    private let refreshControl = UIRefreshControl()
+    
+    public init(refresh: (() -> AnyPublisher<Void, Never>)? = nil,
+                cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
                 cellContent: @escaping (Data.Element) -> CellContent) {
+        self.refresh = refresh
         self.cellSize = cellSize
         self.cellContent = cellContent
         let layout = UICollectionViewFlowLayout()
@@ -74,6 +85,10 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         
         collectionView.backgroundColor = UIColor.clear
         
+        refreshControl.addTarget(self, action: #selector(didPullToRefresh(_:)), for: .valueChanged)
+        collectionView.alwaysBounceVertical = true
+        collectionView.refreshControl = refreshControl
+        
         collectionView.register(MyCollectionViewCell<CellContent>.classForCoder(),
                                 forCellWithReuseIdentifier: cellReuseIdentifier)
         
@@ -89,6 +104,19 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         }
     }
     
+    @objc
+    private func didPullToRefresh(_ sender: Any) {
+        // Do you your api calls in here, and then asynchronously remember to stop the
+        // refreshing when you've got a result (either positive or negative)
+        guard let refresh = self.refresh else {
+            self.refreshControl.endRefreshing()
+            return
+        }
+        
+        _ = refresh()
+            .receive(on: RunLoop.main)
+            .sink(receiveCompletion: { _ in self.refreshControl.endRefreshing() }, receiveValue: { _ in })
+    }
 
     override func collectionView(_ collectionView: UICollectionView, willDisplay cell: UICollectionViewCell, forItemAt indexPath: IndexPath) {
         (cell as? MyCollectionViewCell<CellContent>)?.moveHostingControllerToParentViewController(self)
