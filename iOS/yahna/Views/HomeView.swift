@@ -21,13 +21,13 @@ struct HomeView: View {
             
             ItemsView(viewModel: DataProvider.shared.newStories)
                 .tabItem {
-                    Image(systemName: "sparkles")
+                    Image(systemName: "rays")
                     Text("New")
             }
             
             ItemsView(viewModel: DataProvider.shared.askStories)
                 .tabItem {
-                    Image(systemName: "questionmark.square")
+                    Image(systemName: "questionmark.circle")
                     Text("Ask")
             }
             
