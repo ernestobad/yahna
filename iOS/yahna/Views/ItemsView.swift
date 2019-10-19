@@ -12,17 +12,21 @@ import Combine
 struct ItemsView: View {
     @ObservedObject var viewModel: ItemsViewModel
     
+    @State var contentOffset: CGPoint = .zero
+     
     var body: some View {
         NavigationView {
             StatesView(viewModel: viewModel, error: { DefaultErrorView() }, empty: { DefaultEmptyView() }) {
                 GeometryReader { geometry in
                     CollectionView(self.viewModel.items,
+                                   contentOffset: self.$contentOffset,
                                    refresh: { DataProvider.shared.refreshViewModel(self.viewModel, force: true).map({ _ -> Void in }).eraseToAnyPublisher() },
                                    cellSize: ItemCellView.calcCellSize) { (item) in
                         ItemCellView(item: item,
                                      availableWidth: geometry.size.width)
                     }
-                    .navigationBarTitle(Text(self.viewModel.parentId.title ?? ""), displayMode: NavigationBarItem.TitleDisplayMode.inline)
+                    .navigationBarTitle(Text(self.viewModel.parentId.title ?? ""),
+                                        displayMode: NavigationBarItem.TitleDisplayMode.inline)
                 }
             }
         }.onAppear {

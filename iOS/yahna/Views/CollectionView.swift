@@ -14,6 +14,8 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     
     let data: Data
     
+    var contentOffset: Binding<CGPoint>
+    
     let cellContent: (Data.Element) -> CellContent
     
     let cellSize: (Data.Element, CGFloat) -> CGSize
@@ -21,9 +23,11 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     let refresh: (() -> AnyPublisher<Void, Never>)?
     
     public init(_ data: Data,
+                contentOffset: Binding<CGPoint>,
                 refresh:  (() -> AnyPublisher<Void, Never>)? = nil,
                 cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
                 @ViewBuilder cellContent: @escaping (Data.Element) -> CellContent) {
+        self.contentOffset = contentOffset
         self.data = data
         self.refresh = refresh
         self.cellContent = cellContent
@@ -33,8 +37,11 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     typealias UIViewControllerType = MyCollectionViewController
     
     func makeUIViewController(context: UIViewControllerRepresentableContext<CollectionView>) -> MyCollectionViewController<Data, CellContent> {
-        let vc = MyCollectionViewController<Data, CellContent>(refresh: refresh, cellSize: cellSize, cellContent: cellContent)
-        return vc
+        return MyCollectionViewController<Data, CellContent>(contentOffset: contentOffset,
+                                                             initialData: data,
+                                                             refresh: refresh,
+                                                             cellSize: cellSize,
+                                                             cellContent: cellContent)
     }
     
     func updateUIViewController(_ uiViewController: MyCollectionViewController<Data, CellContent>, context: UIViewControllerRepresentableContext<CollectionView>) {
@@ -46,7 +53,9 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     var dataSource: UICollectionViewDiffableDataSource<MyCollectionViewSection, Data.Element>!
     
-    var data: Data?
+    var initialData: Data?
+    
+    var contentOffset: Binding<CGPoint>?
     
     let cellSize: (Data.Element, CGFloat) -> CGSize
     
@@ -58,12 +67,17 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     private let refreshControl = UIRefreshControl()
     
-    public init(refresh: (() -> AnyPublisher<Void, Never>)? = nil,
+    public init(contentOffset: Binding<CGPoint>? = nil,
+                initialData: Data? = nil,
+                refresh: (() -> AnyPublisher<Void, Never>)? = nil,
                 cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
                 cellContent: @escaping (Data.Element) -> CellContent) {
+        self.contentOffset = contentOffset
+        self.initialData = initialData
         self.refresh = refresh
         self.cellSize = cellSize
         self.cellContent = cellContent
+        
         let layout = UICollectionViewFlowLayout()
         layout.minimumInteritemSpacing = 0
         layout.minimumLineSpacing = 0
@@ -74,11 +88,11 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         fatalError("init(coder:) has not been implemented")
     }
     
-    func update(data: Data) {
+    func update(data: Data, animate: Bool = true, completion: (() -> Void)? = nil) {
         var snapshot = NSDiffableDataSourceSnapshot<MyCollectionViewSection, Data.Element>()
         snapshot.appendSections([.section])
         snapshot.appendItems(Array(data), toSection: .section)
-        dataSource.apply(snapshot, animatingDifferences: true)
+        dataSource.apply(snapshot, animatingDifferences: animate, completion: completion)
     }
     
     override func viewDidLoad() {
@@ -101,6 +115,15 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
             cell.setUp(content: self.cellContent(element))
             
             return cell
+        }
+        
+        if let data = initialData {
+            self.update(data: data, animate: false) {
+                if let contentOffset = self.contentOffset {
+                    self.collectionView.setContentOffset(contentOffset.wrappedValue, animated: false)
+                }
+            }
+            initialData = nil
         }
     }
     
@@ -128,6 +151,22 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         } else {
             return .zero
         }
+    }
+    
+    override func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        contentOffset?.wrappedValue = scrollView.contentOffset
+    }
+    
+    override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        DispatchQueue.main.async {
+            if !scrollView.isDecelerating {
+                self.contentOffset?.wrappedValue = scrollView.contentOffset
+            }
+        }
+    }
+    
+    override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
+        contentOffset?.wrappedValue = scrollView.contentOffset
     }
 }
 
