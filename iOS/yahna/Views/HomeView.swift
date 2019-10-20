@@ -8,42 +8,63 @@
 
 import SwiftUI
 
+enum Tab : String {
+    
+    case home
+    case new
+    case ask
+    case show
+    case jobs
+    
+    var notificationName: Notification.Name {
+        return Notification.Name("tab.\(self.rawValue)")
+    }
+}
+
+final class SelectedItem: ObservableObject {
+    
+    @Published var value: Tab = .home {
+        didSet {
+            NotificationCenter.default.post(name: value.notificationName, object: nil)
+        }
+    }
+}
+
 struct HomeView: View {
+    
+    @ObservedObject private var selectedItemOb = SelectedItem()
     
     var body: some View {
         
-        TabView {
-            ItemsView(viewModel: DataProvider.shared.topStories)
-                .tabItem {
-                    Image(systemName: "house")
-                    Text("Home")
-            }
+        TabView(selection: $selectedItemOb.value) {
             
-            ItemsView(viewModel: DataProvider.shared.newStories)
-                .tabItem {
-                    Image(systemName: "rays")
-                    Text("New")
-            }
+            ItemsView(tab: .home, viewModel: DataProvider.shared.topStories).tabItem {
+                Image(systemName: "house")
+                Text("Home")
+            }.tag(Tab.home)
             
-            ItemsView(viewModel: DataProvider.shared.askStories)
-                .tabItem {
-                    Image(systemName: "questionmark.circle")
-                    Text("Ask")
-            }
+            ItemsView(tab: .new, viewModel: DataProvider.shared.newStories).tabItem {
+                Image(systemName: "rays")
+                Text("New")
+            }.tag(Tab.new)
             
-            ItemsView(viewModel: DataProvider.shared.showStories)
-                .tabItem {
-                    Image(systemName: "eye")
-                    Text("Show")
-            }
+            ItemsView(tab: .ask, viewModel: DataProvider.shared.askStories).tabItem {
+                Image(systemName: "questionmark.circle")
+                Text("Ask")
+            }.tag(Tab.ask)
             
-            ItemsView(viewModel: DataProvider.shared.jobStories)
-                .tabItem {
-                    Image(systemName: "briefcase")
-                    Text("Jobs")
-            }
+            ItemsView(tab: .show, viewModel: DataProvider.shared.showStories).tabItem {
+                Image(systemName: "eye")
+                Text("Show")
+            }.tag(Tab.show)
+            
+            ItemsView(tab: .jobs, viewModel: DataProvider.shared.jobStories).tabItem {
+                Image(systemName: "briefcase")
+                Text("Jobs")
+                }.tag(Tab.jobs)
+            
         }.edgesIgnoringSafeArea(.top)
-        .onAppear {
+            .onAppear {
             
             DataProvider.shared.refreshViewModel(DataProvider.shared.topStories)
             DataProvider.shared.refreshViewModel(DataProvider.shared.newStories)

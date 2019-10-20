@@ -9,17 +9,43 @@
 import SwiftUI
 import Combine
 
+
+class ContentOffsetWrapper: ObservableObject {
+    
+    @Published var value: CGPoint = .zero
+    
+    private let tabNotificationPublisher: AnyPublisher<Notification, Never>
+    
+    init(tab: Tab) {
+        self.tabNotificationPublisher = NotificationCenter.Publisher(center: .default, name: tab.notificationName, object: nil)
+        .eraseToAnyPublisher()
+        _ = tabNotificationPublisher
+            .receive(on: DispatchQueue.main)
+            .sink(receiveValue: { _ in
+                self.value = .zero
+            })
+    }
+}
+
 struct ItemsView: View {
+    
     @ObservedObject var viewModel: ItemsViewModel
     
-    @State var contentOffset: CGPoint = .zero
+    @ObservedObject var contentOffset: ContentOffsetWrapper
+    
+    init(tab: Tab, viewModel: ItemsViewModel) {
+        self.contentOffset = ContentOffsetWrapper(tab: tab)
+        self.viewModel = viewModel
+    }
      
     var body: some View {
         NavigationView {
-            StatesView(viewModel: viewModel, error: { DefaultErrorView() }, empty: { DefaultEmptyView() }) {
+            StatesView(viewModel: viewModel,
+                       error: { DefaultErrorView() },
+                       empty: { DefaultEmptyView() }) {
                 GeometryReader { geometry in
                     CollectionView(self.viewModel.items,
-                                   contentOffset: self.$contentOffset,
+                                   contentOffset: self.$contentOffset.value,
                                    refresh: { DataProvider.shared.refreshViewModel(self.viewModel, force: true).map({ _ -> Void in }).eraseToAnyPublisher() },
                                    cellSize: ItemCellView.calcCellSize) { (item) in
                         ItemCellView(item: item,
@@ -71,6 +97,6 @@ struct ItemsView_Previews: PreviewProvider {
         let topStories = ItemsViewModel(.topStories)
         topStories.items = items
         
-        return ItemsView(viewModel: topStories)
+        return ItemsView(tab: .home, viewModel: topStories)
     }
 }

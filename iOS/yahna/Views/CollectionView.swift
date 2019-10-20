@@ -45,27 +45,30 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     }
     
     func updateUIViewController(_ uiViewController: MyCollectionViewController<Data, CellContent>, context: UIViewControllerRepresentableContext<CollectionView>) {
-        uiViewController.update(data: data)
+        
+        uiViewController.update(data: data, animate: true)
     }
 }
 
 class MyCollectionViewController<Data, CellContent> : UICollectionViewController, UICollectionViewDelegateFlowLayout where Data : RandomAccessCollection, CellContent : View, Data.Element : Hashable & Identifiable {
     
-    var dataSource: UICollectionViewDiffableDataSource<MyCollectionViewSection, Data.Element>!
+    private var dataSource: UICollectionViewDiffableDataSource<MyCollectionViewSection, Data.Element>!
     
-    var initialData: Data?
+    private var initialData: Data?
     
-    var contentOffset: Binding<CGPoint>?
+    private var contentOffset: Binding<CGPoint>?
     
-    let cellSize: (Data.Element, CGFloat) -> CGSize
+    private let cellSize: (Data.Element, CGFloat) -> CGSize
     
-    let cellContent: (Data.Element) -> CellContent
+    private let cellContent: (Data.Element) -> CellContent
     
-    let refresh: (() -> AnyPublisher<Void, Never>)?
+    private let refresh: (() -> AnyPublisher<Void, Never>)?
     
     private let cellReuseIdentifier = "MyCollectionViewControllerCell"
     
     private let refreshControl = UIRefreshControl()
+    
+    private var isScrolling: Bool = false
     
     public init(contentOffset: Binding<CGPoint>? = nil,
                 initialData: Data? = nil,
@@ -92,7 +95,13 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         var snapshot = NSDiffableDataSourceSnapshot<MyCollectionViewSection, Data.Element>()
         snapshot.appendSections([.section])
         snapshot.appendItems(Array(data), toSection: .section)
-        dataSource.apply(snapshot, animatingDifferences: animate, completion: completion)
+        
+        dataSource.apply(snapshot, animatingDifferences: animate) {
+            if !self.isScrolling, let contentOffset = self.contentOffset?.wrappedValue, contentOffset != self.collectionView.contentOffset {
+                self.collectionView.setContentOffset(contentOffset, animated: true)
+            }
+            completion?()
+        }
     }
     
     override func viewDidLoad() {
@@ -153,20 +162,27 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         }
     }
     
+    override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+        isScrolling = true
+    }
+    
     override func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         contentOffset?.wrappedValue = scrollView.contentOffset
+        isScrolling = false
     }
     
     override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         DispatchQueue.main.async {
             if !scrollView.isDecelerating {
                 self.contentOffset?.wrappedValue = scrollView.contentOffset
+                self.isScrolling = false
             }
         }
     }
     
     override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         contentOffset?.wrappedValue = scrollView.contentOffset
+        isScrolling = false
     }
 }
 
