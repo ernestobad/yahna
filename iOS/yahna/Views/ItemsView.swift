@@ -9,31 +9,28 @@
 import SwiftUI
 import Combine
 
-
 class ContentOffsetWrapper: ObservableObject {
     
     @Published var value: CGPoint = .zero
     
-    private let tabNotificationPublisher: AnyPublisher<Notification, Never>
+    private var scrollToTopCancellable: AnyCancellable?
     
     init(tab: Tab) {
-        self.tabNotificationPublisher = NotificationCenter.Publisher(center: .default, name: tab.notificationName, object: nil)
-        .eraseToAnyPublisher()
-        _ = tabNotificationPublisher
-            .receive(on: DispatchQueue.main)
-            .sink(receiveValue: { _ in
-                self.value = .zero
-            })
+        scrollToTopCancellable = NavigationHelper.shared.scrollToTopPublisher(tab: tab)
+            .sink { self.value = .zero }
     }
 }
 
 struct ItemsView: View {
+    
+    let tab: Tab
     
     @ObservedObject var viewModel: ItemsViewModel
     
     @ObservedObject var contentOffset: ContentOffsetWrapper
     
     init(tab: Tab, viewModel: ItemsViewModel) {
+        self.tab = tab
         self.contentOffset = ContentOffsetWrapper(tab: tab)
         self.viewModel = viewModel
     }
@@ -43,15 +40,16 @@ struct ItemsView: View {
             StatesView(viewModel: viewModel,
                        error: { DefaultErrorView() },
                        empty: { DefaultEmptyView() }) {
-                GeometryReader { geometry in
-                    CollectionView(self.viewModel.items,
-                                   contentOffset: self.$contentOffset.value,
-                                   refresh: { DataProvider.shared.refreshViewModel(self.viewModel, force: true).map({ _ -> Void in }).eraseToAnyPublisher() },
-                                   cellSize: ItemCellView.calcCellSize) { (item) in
-                        ItemCellView(item: item,
-                                     availableWidth: geometry.size.width)
-                    }
-                    .navigationBarTitle(Text(self.viewModel.parentId.title ?? ""),
+                        GeometryReader { geometry in
+                            CollectionView(self.viewModel.items,
+                                           contentOffset: self.$contentOffset.value,
+                                           refresh: { DataProvider.shared.refreshViewModel(self.viewModel, force: true).map({ _ -> Void in }).eraseToAnyPublisher() },
+                                           cellSize: ItemCellView.calcCellSize) { (item) in
+                                            ItemCellView(tab: self.tab,
+                                                         item: item,
+                                                         availableWidth: geometry.size.width)
+                            }
+                            .navigationBarTitle(Text(self.viewModel.parentId.title ?? ""),
                                         displayMode: NavigationBarItem.TitleDisplayMode.inline)
                 }
             }

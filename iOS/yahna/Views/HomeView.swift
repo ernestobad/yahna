@@ -25,7 +25,7 @@ final class SelectedItem: ObservableObject {
     
     @Published var value: Tab = .home {
         didSet {
-            NotificationCenter.default.post(name: value.notificationName, object: nil)
+            NavigationHelper.shared.onTabItemTapped(tab: value)
         }
     }
 }

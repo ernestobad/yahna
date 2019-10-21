@@ -7,17 +7,57 @@
 //
 
 import SwiftUI
+import Combine
+
+class NavigationLinkActiveWrapper: ObservableObject {
+    @Published var value: Bool = false {
+        didSet {
+            if value {
+                NavigationHelper.shared.onItemViewPushed()
+            } else {
+                NavigationHelper.shared.onItemViewPopped()
+            }
+        }
+    }
+    
+    var popItemViewCancellable: AnyCancellable?
+    
+    init(tab: Tab) {
+        popItemViewCancellable = NavigationHelper.shared.popItemViewPublisher(tab: tab)
+            .sink {
+                if (self.value) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.value = false
+                    }
+                }
+        }
+    }
+}
 
 struct ItemCellView: View {
+    
+    let tab: Tab
     
     var item: Item
     
     let availableWidth: CGFloat
     
+    @ObservedObject var navigationLinkActive: NavigationLinkActiveWrapper
+    
     @ObservedObject var webViewState = WebViewState()
     
+    init(tab: Tab, item: Item, availableWidth: CGFloat) {
+        self.tab = tab
+        self.item = item
+        self.availableWidth = availableWidth
+        navigationLinkActive = NavigationLinkActiveWrapper(tab: tab)
+    }
+    
     var body: some View {
-        NavigationLink(destination: ItemView(viewModel: DataProvider.shared.itemViewModel(item))) {
+        ZStack {
+            NavigationLink(destination: ItemView(viewModel: DataProvider.shared.itemViewModel(item)),
+                           isActive: $navigationLinkActive.value) { EmptyView() }
+            
             VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading, spacing: 8) {
                     bySection
@@ -39,6 +79,9 @@ struct ItemCellView: View {
         .foregroundColor(Color(UIColor.systemGray))
         .font(Fonts.caption.font)
         .fixedSize(horizontal: false, vertical: true)
+        .onTapGesture {
+            self.navigationLinkActive.value = true
+        }
     }
     
     var titleSection: some View {
@@ -46,6 +89,9 @@ struct ItemCellView: View {
             .font(Fonts.body.font)
             .foregroundColor(Color.init(UIColor.label))
             .lineLimit(nil)
+        .onTapGesture {
+            self.navigationLinkActive.value = true
+        }
     }
     
     var linkSection: some View {
@@ -64,6 +110,9 @@ struct ItemCellView: View {
         .foregroundColor(Color(UIColor.systemGray))
         .font(Fonts.caption.font)
         .fixedSize(horizontal: false, vertical: true)
+        .onTapGesture {
+            self.navigationLinkActive.value = true
+        }
     }
         
     static func calcCellSize(_ item: Item, _ availableWidth: CGFloat) -> CGSize {
@@ -111,7 +160,9 @@ struct ItemCellView_Previews: PreviewProvider {
                         title: "WeWork says will file to withdraw IPO, WeWork says will file to withdraw IPO",
                         descendantsCount: 30)
         
-        let itemCellView = ItemCellView(item: item, availableWidth: 414)
+        let itemCellView = ItemCellView(tab: .home,
+                                        item: item,
+                                        availableWidth: 414)
         
         return Group {
             itemCellView.environment(\.colorScheme, .light)
