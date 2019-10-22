@@ -14,7 +14,7 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     
     let data: Data
     
-    var contentOffset: Binding<CGPoint>
+    var contentOffset: Binding<CGPoint?>
     
     let cellContent: (Data.Element) -> CellContent
     
@@ -23,7 +23,7 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     let refresh: (() -> AnyPublisher<Void, Never>)?
     
     public init(_ data: Data,
-                contentOffset: Binding<CGPoint>,
+                contentOffset: Binding<CGPoint?>,
                 refresh:  (() -> AnyPublisher<Void, Never>)? = nil,
                 cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
                 @ViewBuilder cellContent: @escaping (Data.Element) -> CellContent) {
@@ -45,8 +45,9 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     }
     
     func updateUIViewController(_ uiViewController: MyCollectionViewController<Data, CellContent>, context: UIViewControllerRepresentableContext<CollectionView>) {
-        
-        uiViewController.update(data: data, animate: true)
+        uiViewController.update(data: data,
+                                contentOffset: contentOffset,
+                                animate: true)
     }
 }
 
@@ -56,7 +57,7 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     private var initialData: Data?
     
-    private var contentOffset: Binding<CGPoint>?
+    private var contentOffset: Binding<CGPoint?>?
     
     private let cellSize: (Data.Element, CGFloat) -> CGSize
     
@@ -68,9 +69,7 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     private let refreshControl = UIRefreshControl()
     
-    private var isScrolling: Bool = false
-    
-    public init(contentOffset: Binding<CGPoint>? = nil,
+    public init(contentOffset: Binding<CGPoint?>? = nil,
                 initialData: Data? = nil,
                 refresh: (() -> AnyPublisher<Void, Never>)? = nil,
                 cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
@@ -91,20 +90,33 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         fatalError("init(coder:) has not been implemented")
     }
     
-    func update(data: Data, animate: Bool = true, completion: (() -> Void)? = nil) {
+    func update(data: Data,
+                contentOffset: Binding<CGPoint?>? = nil,
+                animate: Bool = true) {
+        
+        if let contentOffset = contentOffset {
+            self.contentOffset = contentOffset
+        }
+        
         var snapshot = NSDiffableDataSourceSnapshot<MyCollectionViewSection, Data.Element>()
         snapshot.appendSections([.section])
         snapshot.appendItems(Array(data), toSection: .section)
         
         dataSource.apply(snapshot, animatingDifferences: animate) {
-            if !self.isScrolling, let contentOffset = self.contentOffset?.wrappedValue, contentOffset != self.collectionView.contentOffset {
-                self.collectionView.setContentOffset(contentOffset, animated: true)
+            if let contentOffset = self.contentOffset?.wrappedValue, contentOffset != self.collectionView.contentOffset {
+                self.collectionView.setContentOffset(contentOffset, animated: animate)
             }
-            completion?()
         }
     }
     
+    private var popItemViewCancellable: AnyCancellable?
+    
     override func viewDidLoad() {
+        
+        // workaround for NavigationLink.isActive crashing when set to false.
+        popItemViewCancellable = NavigationHelper.shared.popItemViewPublisher().sink(receiveValue: {
+            self.navigationController?.popToRootViewController(animated: true)
+        })
         
         collectionView.backgroundColor = UIColor.clear
         
@@ -127,11 +139,7 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         }
         
         if let data = initialData {
-            self.update(data: data, animate: false) {
-                if let contentOffset = self.contentOffset {
-                    self.collectionView.setContentOffset(contentOffset.wrappedValue, animated: false)
-                }
-            }
+            self.update(data: data, animate: false)
             initialData = nil
         }
     }
@@ -163,26 +171,23 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     }
     
     override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-        isScrolling = true
+        contentOffset?.wrappedValue = nil
     }
     
     override func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         contentOffset?.wrappedValue = scrollView.contentOffset
-        isScrolling = false
     }
     
     override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         DispatchQueue.main.async {
             if !scrollView.isDecelerating {
                 self.contentOffset?.wrappedValue = scrollView.contentOffset
-                self.isScrolling = false
             }
         }
     }
     
     override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         contentOffset?.wrappedValue = scrollView.contentOffset
-        isScrolling = false
     }
 }
 

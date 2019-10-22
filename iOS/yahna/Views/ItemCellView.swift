@@ -19,24 +19,9 @@ class NavigationLinkActiveWrapper: ObservableObject {
             }
         }
     }
-    
-    var popItemViewCancellable: AnyCancellable?
-    
-    init(tab: Tab) {
-        popItemViewCancellable = NavigationHelper.shared.popItemViewPublisher(tab: tab)
-            .sink {
-                if (self.value) {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        self.value = false
-                    }
-                }
-        }
-    }
 }
 
 struct ItemCellView: View {
-    
-    let tab: Tab
     
     var item: Item
     
@@ -46,11 +31,10 @@ struct ItemCellView: View {
     
     @ObservedObject var webViewState = WebViewState()
     
-    init(tab: Tab, item: Item, availableWidth: CGFloat) {
-        self.tab = tab
+    init(item: Item, availableWidth: CGFloat) {
         self.item = item
         self.availableWidth = availableWidth
-        navigationLinkActive = NavigationLinkActiveWrapper(tab: tab)
+        navigationLinkActive = NavigationLinkActiveWrapper()
     }
     
     var body: some View {
@@ -160,8 +144,7 @@ struct ItemCellView_Previews: PreviewProvider {
                         title: "WeWork says will file to withdraw IPO, WeWork says will file to withdraw IPO",
                         descendantsCount: 30)
         
-        let itemCellView = ItemCellView(tab: .home,
-                                        item: item,
+        let itemCellView = ItemCellView(item: item,
                                         availableWidth: 414)
         
         return Group {

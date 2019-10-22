@@ -7,6 +7,7 @@
 //
 
 import Foundation
+import SwiftUI
 
 struct ViewState {
     
@@ -57,6 +58,8 @@ class RefreshableViewModelBase : RefreshableViewModel {
 class ItemsViewModel : RefreshableViewModelBase {
     
     @Published var items: [Item] = [Item]()
+    
+    @Published var contentOffset: CGPoint?
     
     override var isEmpty: Bool { items.isEmpty }
     

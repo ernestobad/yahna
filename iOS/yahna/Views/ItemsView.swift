@@ -9,32 +9,24 @@
 import SwiftUI
 import Combine
 
-class ContentOffsetWrapper: ObservableObject {
-    
-    @Published var value: CGPoint = .zero
-    
-    private var scrollToTopCancellable: AnyCancellable?
-    
-    init(tab: Tab) {
-        scrollToTopCancellable = NavigationHelper.shared.scrollToTopPublisher(tab: tab)
-            .sink { self.value = .zero }
-    }
-}
-
 struct ItemsView: View {
     
     let tab: Tab
     
     @ObservedObject var viewModel: ItemsViewModel
     
-    @ObservedObject var contentOffset: ContentOffsetWrapper
+    private var scrollToTopCancellable: AnyCancellable?
     
     init(tab: Tab, viewModel: ItemsViewModel) {
         self.tab = tab
-        self.contentOffset = ContentOffsetWrapper(tab: tab)
         self.viewModel = viewModel
+        
+        scrollToTopCancellable = NavigationHelper.shared.scrollToTopPublisher(tab: tab)
+            .sink {
+                viewModel.contentOffset = .zero
+        }
     }
-     
+    
     var body: some View {
         NavigationView {
             StatesView(viewModel: viewModel,
@@ -42,11 +34,10 @@ struct ItemsView: View {
                        empty: { DefaultEmptyView() }) {
                         GeometryReader { geometry in
                             CollectionView(self.viewModel.items,
-                                           contentOffset: self.$contentOffset.value,
+                                           contentOffset: self.$viewModel.contentOffset,
                                            refresh: { DataProvider.shared.refreshViewModel(self.viewModel, force: true).map({ _ -> Void in }).eraseToAnyPublisher() },
                                            cellSize: ItemCellView.calcCellSize) { (item) in
-                                            ItemCellView(tab: self.tab,
-                                                         item: item,
+                                            ItemCellView(item: item,
                                                          availableWidth: geometry.size.width)
                             }
                             .navigationBarTitle(Text(self.viewModel.parentId.title ?? ""),

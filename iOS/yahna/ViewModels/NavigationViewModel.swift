@@ -18,10 +18,15 @@ class NavigationHelper {
     
     private(set) var isItemViewPushed: Bool = false
     
+    private(set) var selectedTab: Tab = .home
+    
     private let passthroughSubject = PassthroughSubject<Tab, Never>()
     
-    func onTabItemTapped(tab: Tab) {
-        passthroughSubject.send(tab)
+    func onTabItemSelected(tab: Tab) {
+        if selectedTab == tab {
+            passthroughSubject.send(tab)
+        }
+        selectedTab = tab
     }
     
     func onItemViewPushed() {
@@ -39,9 +44,9 @@ class NavigationHelper {
             .eraseToAnyPublisher()
     }
     
-    func popItemViewPublisher(tab: Tab) -> AnyPublisher<Void, Never> {
+    func popItemViewPublisher() -> AnyPublisher<Void, Never> {
         passthroughSubject
-            .filter({ $0 == tab && self.isItemViewPushed })
+            .filter({ _ in self.isItemViewPushed })
             .map({ _ -> Void in })
             .eraseToAnyPublisher()
     }

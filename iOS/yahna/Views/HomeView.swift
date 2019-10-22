@@ -25,7 +25,7 @@ final class SelectedItem: ObservableObject {
     
     @Published var value: Tab = .home {
         didSet {
-            NavigationHelper.shared.onTabItemTapped(tab: value)
+            NavigationHelper.shared.onTabItemSelected(tab: value)
         }
     }
 }
