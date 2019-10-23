@@ -21,6 +21,8 @@ struct TextView: UIViewRepresentable {
     
     let attributedText: NSAttributedString?
     
+    let linkAttributes: [NSAttributedString.Key: Any]?
+    
     let availableWidth: CGFloat
     
     let maximumNumberOfLines: Int
@@ -28,17 +30,24 @@ struct TextView: UIViewRepresentable {
     let lineBreakMode: NSLineBreakMode
     
     init(attributedText: NSAttributedString?,
+         linkAttributes: [NSAttributedString.Key: Any]? = nil,
          availableWidth: CGFloat = CGFloat.greatestFiniteMagnitude,
          maximumNumberOfLines: Int = 0,
          lineBreakMode: NSLineBreakMode = .byWordWrapping) {
         self.attributedText = attributedText
+        self.linkAttributes = linkAttributes
         self.availableWidth = availableWidth
         self.maximumNumberOfLines = maximumNumberOfLines
         self.lineBreakMode = lineBreakMode
     }
     
+    func makeCoordinator() -> TextView.Coordinator {
+        Coordinator()
+    }
+    
     func makeUIView(context: Context) -> MyTextView {
         let textView = MyTextView(frame: .zero)
+        textView.delegate = context.coordinator
         textView.isScrollEnabled = false
         textView.dataDetectorTypes = .all
         textView.isEditable = false
@@ -58,8 +67,18 @@ struct TextView: UIViewRepresentable {
     
     func updateUIView(_ textView: MyTextView, context: Context) {
         textView.attributedText = attributedText
+        textView.linkTextAttributes = linkAttributes
         textView.intrinsicSize = textView.sizeThatFits(CGSize(width: availableWidth, height: CGFloat.greatestFiniteMagnitude))
         textView.invalidateIntrinsicContentSize()
+    }
+    
+    class Coordinator: NSObject, UITextViewDelegate {
+        func textView(_ textView: UITextView, shouldInteractWith url: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+            if interaction == .invokeDefaultAction {
+                VisitedLinksManager.shared.markAsVisited(url.absoluteString)
+            }
+            return true
+        }
     }
 }
 struct TextView_Previews: PreviewProvider {

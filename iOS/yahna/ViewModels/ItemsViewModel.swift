@@ -9,52 +9,6 @@
 import Foundation
 import SwiftUI
 
-struct ViewState {
-    
-    let isRefreshing: Bool
-    
-    let error: Error?
-}
-
-protocol RefreshableViewModel : ObservableObject {
-    
-    var parentId: ParentId { get }
-    
-    var state: ViewState { get }
-    
-    var isEmpty: Bool { get }
-    
-    var lastRefreshTime: Date? { get }
-    
-    func onRefreshStarted()
-    
-    func onRefreshCompleted(_ result: [Item]?, error: Error?)
-}
-
-class RefreshableViewModelBase : RefreshableViewModel {
-    
-    let parentId: ParentId
-    
-    @Published var state: ViewState = ViewState(isRefreshing: false, error: nil)
-    
-    var isEmpty: Bool { return true }
-    
-    var lastRefreshTime: Date?
-    
-    init(_ parentId: ParentId) {
-        self.parentId = parentId
-    }
-    
-    func onRefreshStarted() {
-        self.state = ViewState(isRefreshing: true, error: nil)
-    }
-    
-    func onRefreshCompleted(_ result: [Item]?, error: Error?) {
-        self.state = ViewState(isRefreshing: false, error: error)
-        self.lastRefreshTime = Date()
-    }
-}
-
 class ItemsViewModel : RefreshableViewModelBase {
     
     @Published var items: [Item] = [Item]()
@@ -75,21 +29,3 @@ class ItemsViewModel : RefreshableViewModelBase {
     }
 }
 
-class ItemViewModel : RefreshableViewModelBase {
-    
-    @Published var item: Item
-    
-    override var isEmpty: Bool { item.kids.isEmpty }
-    
-    init(_ item: Item) {
-        self.item = item
-        super.init(ParentId.item(id: item.id))
-    }
-    
-    override func onRefreshCompleted(_ result: [Item]?, error: Error?) {
-        if let item = result?.first {
-            self.item = item
-        }
-        super.onRefreshCompleted(result, error: error)
-    }
-}

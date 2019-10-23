@@ -14,48 +14,11 @@ class DatabaseManager {
     
     private let databasePath = "database/db.sqlite3"
     
-    private let itemsTable = Table("items")
+    private let visitedLinksTable = Table("visited_urls")
     
-    // The item's unique id.
-    private let idCol = Expression<Int64>("id")
+    private let urlCol = Expression<String>("url")
     
-    // true if the item is deleted.
-    private let deletedCol = Expression<Bool>("deleted")
-    
-    // The type of item. One of "job", "story", "comment", "poll", or "pollopt".
-    private let typeCol = Expression<String>("type")
-    
-    // The username of the item's author.
-    private let byCol = Expression<String?>("by")
-    
-    // Creation date of the item, in Unix Time.
     private let timeCol = Expression<Int64>("time")
-    
-    // The comment, story or poll text. HTML.
-    private let textCol = Expression<String?>("text")
-    
-    // true if the item is dead.
-    private let deadCol = Expression<Bool>("dead")
-    
-    // The comment's parent: either another comment or the relevant story.
-    private let parentCol = Expression<Int64?>("parent")
-    
-    // The pollopt's associated poll.
-    private let pollCol = Expression<Int64?>("poll")
-    
-    // The URL of the story.
-    private let urlCol = Expression<String?>("url")
-    
-    // The story's score, or the votes for a pollopt.
-    private let scoreCol = Expression<Int64?>("score")
-    
-    // The title of the story, poll or job.
-    private let titleCol = Expression<String?>("title")
-    
-    // In the case of stories or polls, the total comment count.
-    private let descendantsCountCol = Expression<Int64?>("descendants_count")
-    
-    // TODO: views table.
     
     private var db: Connection?
     
@@ -95,93 +58,25 @@ class DatabaseManager {
         
         let db = try getConnection()
         
-        try db.run(itemsTable.create(ifNotExists: true) { t in
-            t.column(idCol, primaryKey: true)
-            t.column(deletedCol)
-            t.column(typeCol)
-            t.column(byCol)
+        try db.run(visitedLinksTable.create(ifNotExists: true) { t in
+            t.column(urlCol, primaryKey: true)
             t.column(timeCol)
-            t.column(textCol)
-            t.column(deadCol)
-            t.column(parentCol)
-            t.column(pollCol)
-            t.column(urlCol)
-            t.column(scoreCol)
-            t.column(titleCol)
-            t.column(descendantsCountCol)
-            
-            t.foreignKey(parentCol, references: itemsTable, idCol)
-            t.foreignKey(pollCol, references: itemsTable, idCol)
         })
+        
+        try db.run(visitedLinksTable.createIndex(timeCol, unique: false, ifNotExists: true))
     }
     
-    func save(item: Item) throws {
-        
-        try getConnection().run(itemsTable.insert(or: .replace,
-                                     idCol <- item.id,
-                                     deletedCol <- item.deleted,
-                                     typeCol <- item.type.rawValue,
-                                     byCol <- item.by,
-                                     timeCol <- Int64(item.time.timeIntervalSince1970),
-                                     textCol <- item.text,
-                                     deadCol <- item.dead,
-                                     parentCol <- item.parent,
-                                     pollCol <- item.poll,
-                                     urlCol <- item.url,
-                                     scoreCol <- item.score,
-                                     titleCol <- item.title,
-                                     descendantsCountCol <- item.descendantsCount))
-    }
-        
-    func get(id: Int64) throws -> Item? {
-        
-        guard let row = try getConnection().pluck(itemsTable.filter(idCol == id)) else {
-            return nil
-        }
-        
-        return item(from: row)
+    func insertOrUpdateVisitedUrl(_ url: String, time: Date) throws {
+        try getConnection().run(visitedLinksTable.insert(or: .replace,
+                                                         urlCol <- url,
+                                                         timeCol <- Int64(time.timeIntervalSince1970)))
     }
     
-    func get(ids: [Int64]) throws -> [Int64: Item] {
-        
-        let db = try getConnection()
-        
-        var map = [Int64:Item]()
-        for idsChunk in ids.chunked(into: 100) {
-            for row in try db.prepare(itemsTable.filter(idsChunk.contains(idCol))) {
-                if let item = item(from: row) {
-                    map[item.id] = item
-                }
-            }
+    func queryVisitedUrls(lm: Int) throws -> [String] {
+        var result = [String]()
+        for row in try getConnection().prepare(visitedLinksTable.order(timeCol).limit(lm)) {
+            result.append(row[urlCol])
         }
-        return map
+        return result
     }
-    
-    private func item(from row: SQLite.Row) -> Item? {
-        
-        guard row[idCol] > 0 else {
-            Log.logger.error("Invalid id")
-            return nil
-        }
-        
-        guard let type = ItemType.init(rawValue: row[typeCol]) else {
-            Log.logger.error("Invalid type")
-            return nil
-        }
-        
-        return Item(id: row[idCol],
-                    deleted: row[deletedCol],
-                    type: type,
-                    by: row[byCol],
-                    time: Date.init(timeIntervalSince1970: TimeInterval(row[timeCol])),
-                    text: row[textCol],
-                    dead: row[deadCol],
-                    parent: row[parentCol],
-                    poll: row[pollCol],
-                    url: row[urlCol],
-                    score: row[scoreCol],
-                    title: row[titleCol],
-                    descendantsCount: row[descendantsCountCol])
-    }
-    
 }

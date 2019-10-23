@@ -80,6 +80,7 @@ struct ItemCellView: View {
     
     var linkSection: some View {
         TextView(attributedText: item.attributedLink,
+                 linkAttributes: item.linkAttributes,
                  availableWidth: availableWidth - 12*2,
                  maximumNumberOfLines: 1,
                  lineBreakMode: .byTruncatingTail)

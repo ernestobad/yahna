@@ -25,6 +25,7 @@ struct ItemView: View {
                     self.titleSection
                     if !(self.item.url?.isEmpty ?? true) {
                         TextView(attributedText: self.item.attributedLink,
+                                 linkAttributes: self.item.linkAttributes,
                                  availableWidth: geometry.size.width - 24,
                                  maximumNumberOfLines: 1,
                                  lineBreakMode: .byTruncatingTail)

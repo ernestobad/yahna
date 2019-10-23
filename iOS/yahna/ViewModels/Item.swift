@@ -80,6 +80,14 @@ class Item : Identifiable, Hashable {
         attributedHNLink = Item.attributedLink(from: "https://news.ycombinator.com/item?id=\(id)", text: "HN", font: Fonts.caption.uiFont)
     }
     
+    var linkAttributes: [NSAttributedString.Key : Any]? {
+        if let url = url, VisitedLinksManager.shared.isVisited(url) {
+            return [NSAttributedString.Key.foregroundColor: UIColor.systemBlue.withAlphaComponent(0.6) ]
+        } else {
+            return nil
+        }
+    }
+    
     convenience init?(jsonItem: JsonItem) {
         
         guard jsonItem.id > 0, let itemType = ItemType(rawValue: jsonItem.type) else {
@@ -153,8 +161,7 @@ extension Item {
         }
         
         let attributes: [NSAttributedString.Key: Any] = [.link: url,
-                                                         .font: font,
-                                                         .foregroundColor: UIColor.systemTeal]
+                                                         .font: font]
         
         return NSAttributedString(string: text, attributes: attributes)
     }
@@ -182,11 +189,13 @@ extension Item {
                                       value: Fonts.body.uiFont,
                                       range: NSMakeRange(0, attributedString.length))
         
+        attributedString.addAttribute(NSAttributedString.Key.foregroundColor,
+                                      value: UIColor.label,
+                                      range: NSMakeRange(0, attributedString.length))
+        
         if attributedString.string.hasSuffix("\n") {
             attributedString.deleteCharacters(in: NSMakeRange(attributedString.length-1, 1))
         }
-        
-
         
         return attributedString
     }
