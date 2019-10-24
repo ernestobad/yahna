@@ -16,9 +16,11 @@ struct CommentView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            bySection
-            textSection
-        }.padding(.leading, CGFloat(((item.depth ?? 0) - 1) * 12))
+            VStack(alignment: .leading, spacing: 8) {
+                bySection
+                textSection
+            }.padding(.leading, CommentView.leftPadding(item))
+        }.padding(.horizontal, 12)
     }
     
     var bySection: some View {
@@ -37,16 +39,23 @@ struct CommentView: View {
     
     var textSection: some View {
         TextView(attributedText: self.item.attributedText,
-                 availableWidth: availableWidth)
+                 availableWidth: CommentView.textWidth(item, availableWidth))
+    }
+    
+    static func leftPadding(_ item: Item) -> CGFloat {
+        CGFloat(((item.depth ?? 0) - 1) * 12)
+    }
+    
+    static func textWidth(_ item: Item, _ availableWidth: CGFloat) -> CGFloat {
+        return (availableWidth - 24) - CommentView.leftPadding(item)
     }
     
     static func cellSize(_ item: Item, _ availableWidth: CGFloat) -> CGSize {
         
-        let textWidth = availableWidth - CGFloat(((item.depth ?? 0) - 1) * 12)
-        
         let vSpacing: CGFloat = 8
         let bySectionHeight: CGFloat = 17.0
-        let textSectionHeight: CGFloat = item.text?.height(availableWidth: textWidth, font: Fonts.title.uiFont) ?? 0
+        let textSectionHeight: CGFloat = item.text?.height(availableWidth: CommentView.textWidth(item, availableWidth),
+                                                           font: Fonts.body.uiFont) ?? 0
         
         return CGSize(width: availableWidth,
                       height: vSpacing + bySectionHeight +

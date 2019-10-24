@@ -17,22 +17,24 @@ struct ItemView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            self.titleSection
-            if !(self.item.url?.isEmpty ?? true) {
-                TextView(attributedText: self.item.attributedLink,
-                         linkAttributes: self.item.linkAttributes,
-                         availableWidth: availableWidth - 24,
-                         maximumNumberOfLines: 1,
-                         lineBreakMode: .byTruncatingTail)
-            }
-            self.bySection
-            if !(self.item.text?.isEmpty ?? true) {
-                TextView(attributedText: self.item.attributedText,
-                         availableWidth: availableWidth-24)
-            }
-            self.footer
+            VStack(alignment: .leading, spacing: 8) {
+                self.titleSection
+                if !(self.item.url?.isEmpty ?? true) {
+                    TextView(attributedText: self.item.attributedLink,
+                             linkAttributes: self.item.linkAttributes,
+                             availableWidth: availableWidth - 24,
+                             maximumNumberOfLines: 1,
+                             lineBreakMode: .byTruncatingTail)
+                }
+                self.bySection
+                if !(self.item.text?.isEmpty ?? true) {
+                    TextView(attributedText: self.item.attributedText,
+                             availableWidth: availableWidth-24)
+                }
+                self.footer
+            }.padding(.horizontal, 12)
             Divider()
-        }.padding(.horizontal, 12)
+        }.padding(.top, 12)
     }
     
     var titleSection: some View {
@@ -87,6 +89,7 @@ struct ItemView: View {
         
         let titleWidth =  availableWidth - 12*2
         
+        let topPadding: CGFloat = 12
         let vSpacing: CGFloat = 8
         let titleSectionHeight: CGFloat = item.title?.height(availableWidth: titleWidth, font: Fonts.title.uiFont) ?? 0
         let linkSectionHeight: CGFloat = 19.3
@@ -96,6 +99,7 @@ struct ItemView: View {
         let dividerHeight: CGFloat = 1
         
         let height: CGFloat =
+            topPadding +
             vSpacing + titleSectionHeight +
                 (item.url != nil ? vSpacing + linkSectionHeight : 0) +
                 vSpacing + bySectionHeight +
