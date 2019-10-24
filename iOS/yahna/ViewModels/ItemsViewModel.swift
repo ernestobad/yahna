@@ -13,8 +13,6 @@ class ItemsViewModel : RefreshableViewModelBase {
     
     @Published var items: [Item] = [Item]()
     
-    @Published var contentOffset: CGPoint?
-    
     override var isEmpty: Bool { items.isEmpty }
     
     override init(_ parentId: ParentId) {

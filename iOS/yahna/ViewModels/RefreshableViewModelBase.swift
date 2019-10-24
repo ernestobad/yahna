@@ -7,12 +7,15 @@
 //
 
 import Foundation
+import SwiftUI
 
 class RefreshableViewModelBase : RefreshableViewModel {
     
     let parentId: ParentId
     
     @Published var state: ViewState = ViewState(isRefreshing: false, error: nil)
+    
+    @Published var contentOffset: CGPoint?
     
     var isEmpty: Bool { return true }
     

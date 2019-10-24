@@ -36,7 +36,7 @@ struct ItemsView: View {
                             CollectionView(self.viewModel.items,
                                            contentOffset: self.$viewModel.contentOffset,
                                            refresh: { DataProvider.shared.refreshViewModel(self.viewModel, force: true).map({ _ -> Void in }).eraseToAnyPublisher() },
-                                           cellSize: ItemCellView.calcCellSize) { (item) in
+                                           cellSize: ItemCellView.cellSize) { (item) in
                                             ItemCellView(item: item,
                                                          availableWidth: geometry.size.width)
                             }

@@ -2,62 +2,37 @@
 //  ItemView.swift
 //  yahna
 //
-//  Created by Ernesto Badillo on 10/2/19.
+//  Created by Ernesto Badillo on 10/23/19.
 //  Copyright © 2019 Ernesto Badillo. All rights reserved.
 //
 
+import Foundation
 import SwiftUI
 
 struct ItemView: View {
     
-    @ObservedObject var webViewState = WebViewState()
+    let item: Item
     
-    @ObservedObject var viewModel: ItemViewModel
-    
-    var item : Item {
-        viewModel.item
-    }
+    let availableWidth: CGFloat
     
     var body: some View {
-        GeometryReader { geometry in
-            ScrollView(.vertical, showsIndicators: true) {
-                VStack(alignment: .leading, spacing: 8) {
-                    self.titleSection
-                    if !(self.item.url?.isEmpty ?? true) {
-                        TextView(attributedText: self.item.attributedLink,
-                                 linkAttributes: self.item.linkAttributes,
-                                 availableWidth: geometry.size.width - 24,
-                                 maximumNumberOfLines: 1,
-                                 lineBreakMode: .byTruncatingTail)
-                    }
-                    self.bySection
-                    if !(self.item.text?.isEmpty ?? true) {
-                        TextView(attributedText: self.item.attributedText,
-                                 availableWidth: geometry.size.width-24)
-                    }
-                    self.footer
-                    Divider()
-                    
-                    StatesView(viewModel: self.viewModel, error: { EmptyView() }, empty: { EmptyView() }) {
-                        VStack(alignment: .leading, spacing: 8) {
-                            ForEach(self.item.kids) { item in
-                                CommentView(item: item,
-                                            depth: 0,
-                                            availableWidth: geometry.size.width-24)
-                            }
-                        }
-                    }
-                    
-                }
-                .padding(.top, 12)
-                .padding(.horizontal, 12)
-                
-                Rectangle().fill(Color.clear)
+        VStack(alignment: .leading, spacing: 8) {
+            self.titleSection
+            if !(self.item.url?.isEmpty ?? true) {
+                TextView(attributedText: self.item.attributedLink,
+                         linkAttributes: self.item.linkAttributes,
+                         availableWidth: availableWidth - 24,
+                         maximumNumberOfLines: 1,
+                         lineBreakMode: .byTruncatingTail)
             }
-            .onAppear {
-                DataProvider.shared.refreshViewModel(self.viewModel)
+            self.bySection
+            if !(self.item.text?.isEmpty ?? true) {
+                TextView(attributedText: self.item.attributedText,
+                         availableWidth: availableWidth-24)
             }
-        }
+            self.footer
+            Divider()
+        }.padding(.horizontal, 12)
     }
     
     var titleSection: some View {
@@ -107,30 +82,27 @@ struct ItemView: View {
             
         }.fixedSize(horizontal: false, vertical: true)
     }
-}
-
-struct ItemView_Previews: PreviewProvider {
-    static var previews: some View {
+    
+    static func cellSize(_ item: Item, _ availableWidth: CGFloat) -> CGSize {
         
-        let item = Item(id: 1,
-                        deleted: false,
-                        type: ItemType.story,
-                        by: "foobar",
-                        time: Date(),
-                        text: "Foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar.",
-                        dead: false,
-                        parent: nil,
-                        poll: nil,
-                        url: "https://www.reuters.com/article/us-wework-ipo/wework-says-will-file-to-withdraw-ipo-idUSKBN1WF1NS",
-                        score: 312,
-                        title: "WeWork says will file to withdraw IPO, WeWork says will file to withdraw IPO",
-                        descendantsCount: 30)
+        let titleWidth =  availableWidth - 12*2
         
-        let itemView = ItemView(viewModel: ItemViewModel(item))
+        let vSpacing: CGFloat = 8
+        let titleSectionHeight: CGFloat = item.title?.height(availableWidth: titleWidth, font: Fonts.title.uiFont) ?? 0
+        let linkSectionHeight: CGFloat = 19.3
+        let bySectionHeight: CGFloat = 17.0
+        let textSectionHeight: CGFloat = item.text?.height(availableWidth: titleWidth, font: Fonts.title.uiFont) ?? 0
+        let footerSectionHeight: CGFloat = 17
+        let dividerHeight: CGFloat = 1
         
-        return Group {
-            itemView.environment(\.colorScheme, .light)
-            itemView.environment(\.colorScheme, .dark)
-        }.background(Color(UIColor.systemBackground))
+        let height: CGFloat =
+            vSpacing + titleSectionHeight +
+                (item.url != nil ? vSpacing + linkSectionHeight : 0) +
+                vSpacing + bySectionHeight +
+                (item.text != nil ? vSpacing + textSectionHeight : 0) +
+                vSpacing + footerSectionHeight +
+                vSpacing + dividerHeight
+        
+        return CGSize(width: availableWidth, height: height)
     }
 }

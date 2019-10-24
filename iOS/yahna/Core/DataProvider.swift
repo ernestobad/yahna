@@ -91,10 +91,14 @@ class DataProvider {
                     items.forEach { idToItemMap[$0.id] = $0 }
                     idToItemMap.values.forEach {
                         if let parentId = $0.parent, let parent = idToItemMap[parentId] {
-                            parent.kids.append($0)
+                            if parent.kids == nil {
+                                parent.kids = [Item]()
+                            }
+                            parent.kids?.append($0)
                         }
                     }
                     parent.calcDescendantCountsAndSortKids()
+                    parent.setAllItemsAndDepths()
                     return [parent]
                 } else {
                     return items

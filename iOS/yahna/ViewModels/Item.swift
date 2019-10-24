@@ -39,8 +39,10 @@ class Item : Identifiable, Hashable {
     var partsIds: [Int64]
     var kidsIds: [Int64]
     
-    var parts = [Item]()
-    var kids = [Item]()
+    var parts: [Item]?
+    var kids: [Item]?
+    var allItems: [Item]?
+    var depth: Int?
     
     var descendantsCount: Int64?
     
@@ -114,11 +116,11 @@ class Item : Identifiable, Hashable {
     @discardableResult
     func calcDescendantCountsAndSortKids() -> Int {
         var count = 0
-        self.kids.forEach {
+        self.kids?.forEach {
             count += 1
             count += $0.calcDescendantCountsAndSortKids()
         }
-        self.kids.sort {
+        self.kids?.sort {
             let lcount = $0.descendantsCount!
             let rcount = $1.descendantsCount!
             if lcount != rcount {
@@ -129,6 +131,19 @@ class Item : Identifiable, Hashable {
         }
         self.descendantsCount = Int64(count)
         return count
+    }
+    
+    func setAllItemsAndDepths() {
+        var allItems = [Item]()
+        getAllItemsAndSetDepths(&allItems, depth: 0)
+        self.allItems = allItems
+    }
+    
+    private func getAllItemsAndSetDepths(_ allItems: inout [Item], depth: Int) {
+        self.depth = depth
+        allItems.append(self)
+        parts?.forEach { $0.depth = depth+1; allItems.append($0) }
+        kids?.forEach { $0.getAllItemsAndSetDepths(&allItems, depth: depth+1) }
     }
     
     func hash(into hasher: inout Hasher) {

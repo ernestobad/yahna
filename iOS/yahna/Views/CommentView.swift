@@ -12,24 +12,13 @@ struct CommentView: View {
     
     let item: Item
     
-    let depth: Int
-    
     let availableWidth: CGFloat
     
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
-            VStack(alignment: .leading, spacing: 8) {
-                bySection
-                textSection
-            }
-            
-            ForEach(item.kids) { item in
-                CommentView(item: item,
-                            depth: self.depth+1,
-                            availableWidth: self.availableWidth-10)
-                    .padding(.leading, 10)
-            }
-        }
+            bySection
+            textSection
+        }.padding(.leading, CGFloat(((item.depth ?? 0) - 1) * 12))
     }
     
     var bySection: some View {
@@ -50,6 +39,19 @@ struct CommentView: View {
         TextView(attributedText: self.item.attributedText,
                  availableWidth: availableWidth)
     }
+    
+    static func cellSize(_ item: Item, _ availableWidth: CGFloat) -> CGSize {
+        
+        let textWidth = availableWidth - CGFloat(((item.depth ?? 0) - 1) * 12)
+        
+        let vSpacing: CGFloat = 8
+        let bySectionHeight: CGFloat = 17.0
+        let textSectionHeight: CGFloat = item.text?.height(availableWidth: textWidth, font: Fonts.title.uiFont) ?? 0
+        
+        return CGSize(width: availableWidth,
+                      height: vSpacing + bySectionHeight +
+                        vSpacing + textSectionHeight + vSpacing)
+    }
 }
 
 struct CommentView_Previews: PreviewProvider {
@@ -69,6 +71,6 @@ struct CommentView_Previews: PreviewProvider {
                         title: "",
                         descendantsCount: 30)
         
-        return CommentView(item: item, depth: 0, availableWidth: 300)
+        return CommentView(item: item, availableWidth: 300)
     }
 }

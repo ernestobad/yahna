@@ -29,8 +29,6 @@ struct ItemCellView: View {
     
     @ObservedObject var navigationLinkActive: NavigationLinkActiveWrapper
     
-    @ObservedObject var webViewState = WebViewState()
-    
     init(item: Item, availableWidth: CGFloat) {
         self.item = item
         self.availableWidth = availableWidth
@@ -39,7 +37,7 @@ struct ItemCellView: View {
     
     var body: some View {
         ZStack {
-            NavigationLink(destination: ItemView(viewModel: DataProvider.shared.itemViewModel(item)),
+            NavigationLink(destination: ItemAndCommentsView(viewModel: DataProvider.shared.itemViewModel(item)),
                            isActive: $navigationLinkActive.value) { EmptyView() }
             
             VStack(alignment: .leading, spacing: 8) {
@@ -100,28 +98,23 @@ struct ItemCellView: View {
         }
     }
         
-    static func calcCellSize(_ item: Item, _ availableWidth: CGFloat) -> CGSize {
+    static func cellSize(_ item: Item, _ availableWidth: CGFloat) -> CGSize {
         
-        let titleSectionHeight: CGFloat
-        if let title = item.title {
-            let attributes: [NSAttributedString.Key: Any] = [NSAttributedString.Key.font: Fonts.title.uiFont]
-            titleSectionHeight = (title as NSString).boundingRect(with: CGSize(width: availableWidth - 12*2,
-                                                                        height: CGFloat.greatestFiniteMagnitude),
-                                                           options: NSStringDrawingOptions.usesLineFragmentOrigin,
-                                                           attributes: attributes,
-                                                           context: nil).size.height
-        } else {
-            titleSectionHeight = 0
-        }
+        let titleWidth =  availableWidth - 12*2
         
         let vSpacing: CGFloat = 8
         let bySectionHeight: CGFloat = 17.0
+        let titleSectionHeight: CGFloat = item.title?.height(availableWidth: titleWidth, font: Fonts.title.uiFont) ?? 0
         let linkSectionHeight: CGFloat = 19.3
         let footerSectionHeight: CGFloat = 17
-        let separatorHeight: CGFloat = 1
+        let dividerHeight: CGFloat = 1
         
         let height: CGFloat =
-            vSpacing + bySectionHeight + vSpacing + titleSectionHeight + (item.url != nil ? vSpacing + linkSectionHeight : 0) + vSpacing + footerSectionHeight + vSpacing + separatorHeight
+            vSpacing + bySectionHeight +
+                vSpacing + titleSectionHeight +
+                (item.url != nil ? vSpacing + linkSectionHeight : 0) +
+                vSpacing + footerSectionHeight +
+                vSpacing + dividerHeight
         
         return CGSize(width: availableWidth, height: height)
     }
