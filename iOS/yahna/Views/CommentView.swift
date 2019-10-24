@@ -21,6 +21,9 @@ struct CommentView: View {
                 textSection
             }.padding(.leading, CommentView.leftPadding(item))
         }.padding(.horizontal, 12)
+            .frame(minWidth: 0, maxWidth: .infinity,
+                   minHeight: 0, maxHeight: .infinity,
+                   alignment: .leading)
     }
     
     var bySection: some View {
@@ -54,8 +57,8 @@ struct CommentView: View {
         
         let vSpacing: CGFloat = 8
         let bySectionHeight: CGFloat = 17.0
-        let textSectionHeight: CGFloat = item.text?.height(availableWidth: CommentView.textWidth(item, availableWidth),
-                                                           font: Fonts.body.uiFont) ?? 0
+        let textSectionHeight: CGFloat = item.attributedText?.height(availableWidth: CommentView.textWidth(item, availableWidth),
+                                                                     font: Fonts.body.uiFont) ?? 0
         
         return CGSize(width: availableWidth,
                       height: vSpacing + bySectionHeight +

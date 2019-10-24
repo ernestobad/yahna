@@ -20,3 +20,14 @@ extension String {
                                                context: nil).size.height
     }
 }
+
+extension NSAttributedString {
+    
+    func height(availableWidth: CGFloat, font: UIFont) -> CGFloat {
+        return self.boundingRect(with: CGSize(width: availableWidth,
+                                              height: CGFloat.greatestFiniteMagnitude),
+                                 options: NSStringDrawingOptions.usesLineFragmentOrigin,
+                                 context: nil).size.height
+    }
+    
+}
