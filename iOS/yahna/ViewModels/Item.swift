@@ -80,6 +80,8 @@ class Item : Identifiable, Hashable {
         attributedText = Item.attributedText(from: text)
         attributedLink = Item.attributedLink(from: url, text: Item.urlWithoutProtocol(url ?? ""))
         attributedHNLink = Item.attributedLink(from: "https://news.ycombinator.com/item?id=\(id)", text: "HN", font: Fonts.caption.uiFont)
+        
+        allItems = [self]
     }
     
     var linkAttributes: [NSAttributedString.Key : Any]? {

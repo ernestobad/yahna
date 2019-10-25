@@ -12,10 +12,6 @@ struct ItemAndCommentsView: View {
     
     @ObservedObject var viewModel: ItemViewModel
     
-    var item : Item {
-        viewModel.item
-    }
-    
     var body: some View {
         GeometryReader { geometry in
             CollectionView(self.viewModel.item.allItems ?? [Item](),
@@ -24,7 +20,7 @@ struct ItemAndCommentsView: View {
                            cellSize: ItemAndCommentsView.cellSize) { (item) in
                             
                             if item.type == .story {
-                                ItemView(item: item, availableWidth: geometry.size.width)
+                                ItemView(viewModel: self.viewModel, availableWidth: geometry.size.width)
                             } else if item.type == .comment {
                                 CommentView(item: item, availableWidth: geometry.size.width)
                             } else {

@@ -11,12 +11,16 @@ import SwiftUI
 
 struct ItemView: View {
     
-    let item: Item
+    var viewModel: ItemViewModel
+    
+    var item : Item {
+        viewModel.item
+    }
     
     let availableWidth: CGFloat
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
+        VStack(alignment: .leading, spacing: 0) {
             VStack(alignment: .leading, spacing: 8) {
                 self.titleSection
                 if !(self.item.url?.isEmpty ?? true) {
@@ -33,18 +37,22 @@ struct ItemView: View {
                 }
                 self.footer
             }.padding(.horizontal, 12)
-            Divider()
+            
+            Divider().padding(.top, 8)
+            
+            StatesView(viewModel: self.viewModel, error: { EmptyView() }, empty: { EmptyView() }) { EmptyView() }
+                .position(x: availableWidth/2, y: 100)
+                .frame(width: 0, height: 0, alignment: .center)
+            
         }.padding(.top, 12)
     }
     
     var titleSection: some View {
         VStack(alignment: .leading) {
-            
             Text(verbatim: item.title ?? "")
                 .font(Fonts.title.font)
                 .lineLimit(nil)
                 .fixedSize(horizontal: false, vertical: true)
-            
         }
     }
     
