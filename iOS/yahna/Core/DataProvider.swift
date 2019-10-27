@@ -23,17 +23,17 @@ class DataProvider {
     let showStories = ItemsViewModel(.showStories)
     let jobStories = ItemsViewModel(.jobStories)
     
-    private var itemsViewModelsCache: NSCache<NSNumber, ItemViewModel> = {
-        let cache = NSCache<NSNumber, ItemViewModel>()
+    private var itemsViewModelsCache: NSCache<NSNumber, ItemAndCommentsViewModel> = {
+        let cache = NSCache<NSNumber, ItemAndCommentsViewModel>()
         cache.countLimit = 100
         return cache
     }()
     
-    public func itemViewModel(_ item: Item) -> ItemViewModel {
+    public func itemViewModel(_ item: Item) -> ItemAndCommentsViewModel {
         if let vm = itemsViewModelsCache.object(forKey: item.id as NSNumber) {
             return vm
         } else {
-            let vm = ItemViewModel(item)
+            let vm = ItemAndCommentsViewModel(item)
             itemsViewModelsCache.setObject(vm, forKey: item.id as NSNumber)
             return vm
         }

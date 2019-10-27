@@ -24,15 +24,16 @@ struct CommentNavButton: ViewModifier {
     }
 }
 
+enum StepDirection {
+    case into
+    case out
+    case up
+    case down
+}
+
 struct CommentNavControlView: View {
         
-    let stepOutAction: (() -> Void)?
-    
-    let stepIntoAction: (() -> Void)?
-    
-    let stepUpAction: (() -> Void)?
-    
-    let stepDownAction: (() -> Void)?
+    let stepAction: ((_ direction: StepDirection) -> Void)?
     
     let stepOutDisabled: Bool
     
@@ -42,18 +43,12 @@ struct CommentNavControlView: View {
     
     let stepDownDisabled: Bool
     
-    init(stepOutAction: (() -> Void)? = nil,
-         stepIntoAction: (() -> Void)? = nil,
-         stepUpAction: (() -> Void)? = nil,
-         stepDownAction: (() -> Void)? = nil,
+    init(stepAction: ((_ direction: StepDirection) -> Void)? = nil,
          stepOutDisabled: Bool = false,
          stepIntoDisabled: Bool = false,
          stepUpDisabled: Bool = false,
          stepDownDisabled: Bool = false) {
-        self.stepOutAction = stepOutAction
-        self.stepIntoAction = stepIntoAction
-        self.stepDownAction = stepDownAction
-        self.stepUpAction = stepUpAction
+        self.stepAction = stepAction
         self.stepOutDisabled = stepOutDisabled
         self.stepIntoDisabled = stepIntoDisabled
         self.stepUpDisabled = stepUpDisabled
@@ -65,7 +60,7 @@ struct CommentNavControlView: View {
     var body: some View {
         ZStack {
             Button(action: {
-                self.stepOutAction?()
+                self.stepAction?(.out)
             }) {
                 Image("stepOut")
                     .resizable()
@@ -75,7 +70,7 @@ struct CommentNavControlView: View {
             }.position(x: side*0.5, y: side*1.5)
             
             Button(action: {
-                self.stepUpAction?()
+                self.stepAction?(.up)
             }) {
                 Image("stepOverUp")
                     .resizable()
@@ -84,7 +79,7 @@ struct CommentNavControlView: View {
             }.position(x: side*1.5, y: side*0.5)
             
             Button(action: {
-                self.stepDownAction?()
+                self.stepAction?(.down)
             }) {
                 Image("stepOverDown")
                     .resizable()
@@ -93,7 +88,7 @@ struct CommentNavControlView: View {
             }.position(x: side*1.5, y: side*2.5)
             
             Button(action: {
-                self.stepIntoAction?()
+                self.stepAction?(.into)
             }) {
                 Image("stepInto")
                     .resizable()

@@ -10,22 +10,30 @@ import SwiftUI
 
 struct ItemAndCommentsView: View {
     
-    @ObservedObject var viewModel: ItemViewModel
+    @ObservedObject var viewModel: ItemAndCommentsViewModel
     
     var body: some View {
         GeometryReader { geometry in
-            CollectionView(self.viewModel.item.all ?? [Item](),
-                           contentOffset: self.$viewModel.contentOffset,
-                           refresh: { DataProvider.shared.refreshViewModel(self.viewModel, force: true).map({ _ -> Void in }).eraseToAnyPublisher() },
-                           cellSize: ItemAndCommentsView.cellSize) { (item) in
-                            
-                            if item.type == .story {
-                                ItemView(viewModel: self.viewModel, availableWidth: geometry.size.width)
-                            } else if item.type == .comment {
-                                CommentView(item: item, availableWidth: geometry.size.width)
-                            } else {
-                                EmptyView()
-                            }
+            ZStack {
+                CollectionView(self.viewModel.item.all ?? [Item](),
+                               contentOffset: self.$viewModel.contentOffset,
+                               firstVisibleIndexPath: self.$viewModel.firstVisibleIndexPath,
+                               refresh: { DataProvider.shared.refreshViewModel(self.viewModel, force: true).map({ _ -> Void in }).eraseToAnyPublisher() },
+                               cellSize: ItemAndCommentsView.cellSize) { (item) in
+                                
+                                if item.type == .story {
+                                    ItemView(viewModel: self.viewModel, availableWidth: geometry.size.width)
+                                } else if item.type == .comment {
+                                    CommentView(item: item, availableWidth: geometry.size.width)
+                                } else {
+                                    EmptyView()
+                                }
+                }
+                
+                CommentNavControlView(stepAction: self.viewModel.onStepButtonSelected)
+                    .position(x: geometry.size.width-300,
+                              y: geometry.size.height-100)
+                
             }.onAppear {
                 DataProvider.shared.refreshViewModel(self.viewModel)
             }
@@ -48,7 +56,7 @@ struct ItemView_Previews: PreviewProvider {
         
         let item = PreviewData.items[0]
         
-        let itemView = ItemAndCommentsView(viewModel: ItemViewModel(item))
+        let itemView = ItemAndCommentsView(viewModel: ItemAndCommentsViewModel(item))
         
         return Group {
             itemView.environment(\.colorScheme, .light)

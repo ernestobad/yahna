@@ -16,6 +16,8 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     
     var contentOffset: Binding<CGPoint?>
     
+    var firstVisibleIndexPath: Binding<IndexPath?>?
+    
     let cellContent: (Data.Element) -> CellContent
     
     let cellSize: (Data.Element, CGFloat) -> CGSize
@@ -24,10 +26,12 @@ struct CollectionView<Data, CellContent> : UIViewControllerRepresentable where D
     
     public init(_ data: Data,
                 contentOffset: Binding<CGPoint?>,
+                firstVisibleIndexPath: Binding<IndexPath?>? = nil,
                 refresh:  (() -> AnyPublisher<Void, Never>)? = nil,
                 cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
                 @ViewBuilder cellContent: @escaping (Data.Element) -> CellContent) {
         self.contentOffset = contentOffset
+        self.firstVisibleIndexPath = firstVisibleIndexPath
         self.data = data
         self.refresh = refresh
         self.cellContent = cellContent
@@ -59,6 +63,8 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     private var contentOffset: Binding<CGPoint?>?
     
+    private var firstVisibleIndexPath: Binding<IndexPath?>?
+    
     private let cellSize: (Data.Element, CGFloat) -> CGSize
     
     private let cellContent: (Data.Element) -> CellContent
@@ -71,11 +77,13 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     public init(contentOffset: Binding<CGPoint?>? = nil,
                 initialData: Data? = nil,
+                firstVisibleIndexPath: Binding<IndexPath?>? = nil,
                 refresh: (() -> AnyPublisher<Void, Never>)? = nil,
                 cellSize: @escaping (Data.Element, CGFloat) -> CGSize,
                 cellContent: @escaping (Data.Element) -> CellContent) {
         self.contentOffset = contentOffset
         self.initialData = initialData
+        self.firstVisibleIndexPath = firstVisibleIndexPath
         self.refresh = refresh
         self.cellSize = cellSize
         self.cellContent = cellContent
@@ -92,10 +100,15 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     func update(data: Data,
                 contentOffset: Binding<CGPoint?>? = nil,
+                firstVisibleIndexPath: Binding<IndexPath?>? = nil,
                 animate: Bool = true) {
         
         if let contentOffset = contentOffset {
             self.contentOffset = contentOffset
+        }
+        
+        if let firstVisibleIndexPath = firstVisibleIndexPath {
+            self.firstVisibleIndexPath = firstVisibleIndexPath
         }
         
         var snapshot = NSDiffableDataSourceSnapshot<MyCollectionViewSection, Data.Element>()
@@ -103,8 +116,17 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
         snapshot.appendItems(Array(data), toSection: .section)
         
         dataSource.apply(snapshot, animatingDifferences: animate) {
-            if let contentOffset = self.contentOffset?.wrappedValue, contentOffset != self.collectionView.contentOffset {
-                self.collectionView.setContentOffset(contentOffset, animated: animate)
+            if let contentOffset = self.contentOffset?.wrappedValue {
+                if contentOffset != self.collectionView.contentOffset {
+                    self.collectionView.setContentOffset(contentOffset,
+                                                         animated: animate)
+                }
+            } else if let firstVisibleIndexPath = self.firstVisibleIndexPath?.wrappedValue {
+                if !self.collectionView.indexPathsForVisibleItems.contains(firstVisibleIndexPath) {
+                    self.collectionView.scrollToItem(at: firstVisibleIndexPath,
+                                                     at: UICollectionView.ScrollPosition.top,
+                                                     animated: animate)
+                }
             }
         }
     }
@@ -172,22 +194,26 @@ class MyCollectionViewController<Data, CellContent> : UICollectionViewController
     
     override func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
         contentOffset?.wrappedValue = nil
+        firstVisibleIndexPath?.wrappedValue = nil
     }
     
     override func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         contentOffset?.wrappedValue = scrollView.contentOffset
+        firstVisibleIndexPath?.wrappedValue = collectionView.indexPathsForVisibleItems.first
     }
     
     override func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         DispatchQueue.main.async {
             if !scrollView.isDecelerating {
                 self.contentOffset?.wrappedValue = scrollView.contentOffset
+                self.firstVisibleIndexPath?.wrappedValue = self.collectionView.indexPathsForVisibleItems.first
             }
         }
     }
     
     override func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         contentOffset?.wrappedValue = scrollView.contentOffset
+        firstVisibleIndexPath?.wrappedValue = collectionView.indexPathsForVisibleItems.first
     }
 }
 
