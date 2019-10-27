@@ -41,7 +41,7 @@ class Item : Identifiable, Hashable {
     
     var parts: [Item]?
     var kids: [Item]?
-    var allItems: [Item]?
+    var all: [Item]?
     var depth: Int?
     
     var descendantsCount: Int64?
@@ -81,7 +81,7 @@ class Item : Identifiable, Hashable {
         attributedLink = Item.attributedLink(from: url, text: Item.urlWithoutProtocol(url ?? ""))
         attributedHNLink = Item.attributedLink(from: "https://news.ycombinator.com/item?id=\(id)", text: "HN", font: Fonts.caption.uiFont)
         
-        allItems = [self]
+        all = [self]
     }
     
     var linkAttributes: [NSAttributedString.Key : Any]? {
@@ -138,7 +138,7 @@ class Item : Identifiable, Hashable {
     func setAllItemsAndDepths() {
         var allItems = [Item]()
         getAllItemsAndSetDepths(&allItems, depth: 0)
-        self.allItems = allItems
+        self.all = allItems
     }
     
     private func getAllItemsAndSetDepths(_ allItems: inout [Item], depth: Int) {

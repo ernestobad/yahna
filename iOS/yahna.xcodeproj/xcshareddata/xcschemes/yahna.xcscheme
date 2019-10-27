@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "943FCD27232D13F30051B94C"
-               BuildableName = "yahna.app"
+               BuildableName = "YAHNA.app"
                BlueprintName = "yahna"
                ReferencedContainer = "container:yahna.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "943FCD27232D13F30051B94C"
-            BuildableName = "yahna.app"
+            BuildableName = "YAHNA.app"
             BlueprintName = "yahna"
             ReferencedContainer = "container:yahna.xcodeproj">
          </BuildableReference>
@@ -62,7 +62,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "943FCD27232D13F30051B94C"
-            BuildableName = "yahna.app"
+            BuildableName = "YAHNA.app"
             BlueprintName = "yahna"
             ReferencedContainer = "container:yahna.xcodeproj">
          </BuildableReference>

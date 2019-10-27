@@ -21,6 +21,8 @@
 		944AA834234783F100220BA8 /* WebViewContainerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 944AA833234783F100220BA8 /* WebViewContainerView.swift */; };
 		9450639C236146D400415B3D /* ItemView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9450639B236146D400415B3D /* ItemView.swift */; };
 		9450639E2361602D00415B3D /* StringExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9450639D2361602D00415B3D /* StringExtensions.swift */; };
+		945063A023635F7000415B3D /* CommentNavControlView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9450639F23635F7000415B3D /* CommentNavControlView.swift */; };
+		945063A3236504B000415B3D /* PreviewData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 945063A2236504B000415B3D /* PreviewData.swift */; };
 		946241A5235375BB0097F468 /* CollectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 946241A4235375BB0097F468 /* CollectionView.swift */; };
 		9472051923463ABF00DF65F2 /* WebView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9472051823463ABF00DF65F2 /* WebView.swift */; };
 		948B37CC2340F50E0062C229 /* JsonItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 948B37CB2340F50E0062C229 /* JsonItem.swift */; };
@@ -54,7 +56,7 @@
 		942B72D22348DA570049EF5D /* StatesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatesView.swift; sourceTree = "<group>"; };
 		942B72D6234A1E320049EF5D /* Fonts.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fonts.swift; sourceTree = "<group>"; };
 		942B72D8234A52AF0049EF5D /* CommentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentView.swift; sourceTree = "<group>"; };
-		943FCD28232D13F30051B94C /* yahna.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = yahna.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		943FCD28232D13F30051B94C /* YAHNA.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = YAHNA.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		943FCD2B232D13F30051B94C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		943FCD2D232D13F30051B94C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
 		943FCD2F232D13F30051B94C /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
@@ -66,6 +68,8 @@
 		944AA833234783F100220BA8 /* WebViewContainerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebViewContainerView.swift; sourceTree = "<group>"; };
 		9450639B236146D400415B3D /* ItemView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemView.swift; sourceTree = "<group>"; };
 		9450639D2361602D00415B3D /* StringExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StringExtensions.swift; sourceTree = "<group>"; };
+		9450639F23635F7000415B3D /* CommentNavControlView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentNavControlView.swift; sourceTree = "<group>"; };
+		945063A2236504B000415B3D /* PreviewData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreviewData.swift; sourceTree = "<group>"; };
 		946241A4235375BB0097F468 /* CollectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CollectionView.swift; sourceTree = "<group>"; };
 		9472051823463ABF00DF65F2 /* WebView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WebView.swift; sourceTree = "<group>"; };
 		948B37CB2340F50E0062C229 /* JsonItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = JsonItem.swift; sourceTree = "<group>"; };
@@ -118,7 +122,7 @@
 		943FCD29232D13F30051B94C /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				943FCD28232D13F30051B94C /* yahna.app */,
+				943FCD28232D13F30051B94C /* YAHNA.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -126,6 +130,7 @@
 		943FCD2A232D13F30051B94C /* yahna */ = {
 			isa = PBXGroup;
 			children = (
+				945063A12365049C00415B3D /* Preview */,
 				948B37D323416B020062C229 /* Utils */,
 				94B445D7235E441300AACD1C /* ViewModels */,
 				94E1010923366E6600721E4D /* Views */,
@@ -148,6 +153,14 @@
 				943FCD34232D13F50051B94C /* Preview Assets.xcassets */,
 			);
 			path = "Preview Content";
+			sourceTree = "<group>";
+		};
+		945063A12365049C00415B3D /* Preview */ = {
+			isa = PBXGroup;
+			children = (
+				945063A2236504B000415B3D /* PreviewData.swift */,
+			);
+			path = Preview;
 			sourceTree = "<group>";
 		};
 		948B37D323416B020062C229 /* Utils */ = {
@@ -213,6 +226,7 @@
 				94D55CBF234E811C00980326 /* LabelView.swift */,
 				946241A4235375BB0097F468 /* CollectionView.swift */,
 				9450639B236146D400415B3D /* ItemView.swift */,
+				9450639F23635F7000415B3D /* CommentNavControlView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -238,7 +252,7 @@
 				94E100FF2333A7A200721E4D /* Logging */,
 			);
 			productName = yahna;
-			productReference = 943FCD28232D13F30051B94C /* yahna.app */;
+			productReference = 943FCD28232D13F30051B94C /* YAHNA.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -345,11 +359,13 @@
 				948B37E62344D1A20062C229 /* Strings.swift in Sources */,
 				94E101042333D1EE00721E4D /* NetworkDataProvider.swift in Sources */,
 				946241A5235375BB0097F468 /* CollectionView.swift in Sources */,
+				945063A3236504B000415B3D /* PreviewData.swift in Sources */,
 				948B37D72343D9060062C229 /* ItemsView.swift in Sources */,
 				94CA2AA2235FC0B9009D4042 /* ItemViewModel.swift in Sources */,
 				942B72D12347F9000049EF5D /* ActivityIndicatorView.swift in Sources */,
 				943FCD30232D13F30051B94C /* HomeView.swift in Sources */,
 				948B37E82345076C0062C229 /* ItemAndCommentsView.swift in Sources */,
+				945063A023635F7000415B3D /* CommentNavControlView.swift in Sources */,
 				9472051923463ABF00DF65F2 /* WebView.swift in Sources */,
 				94E101022333A8CB00721E4D /* Log.swift in Sources */,
 				948B37D523416B170062C229 /* DateExtensions.swift in Sources */,
@@ -515,7 +531,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ernestobad.yahna;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = YAHNA;
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
@@ -542,7 +558,7 @@
 					"@executable_path/Frameworks",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.ernestobad.yahna;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = YAHNA;
 				SUPPORTS_MACCATALYST = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";

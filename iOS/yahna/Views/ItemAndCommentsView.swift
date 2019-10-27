@@ -14,7 +14,7 @@ struct ItemAndCommentsView: View {
     
     var body: some View {
         GeometryReader { geometry in
-            CollectionView(self.viewModel.item.allItems ?? [Item](),
+            CollectionView(self.viewModel.item.all ?? [Item](),
                            contentOffset: self.$viewModel.contentOffset,
                            refresh: { DataProvider.shared.refreshViewModel(self.viewModel, force: true).map({ _ -> Void in }).eraseToAnyPublisher() },
                            cellSize: ItemAndCommentsView.cellSize) { (item) in
@@ -46,19 +46,7 @@ struct ItemAndCommentsView: View {
 struct ItemView_Previews: PreviewProvider {
     static var previews: some View {
         
-        let item = Item(id: 1,
-                        deleted: false,
-                        type: ItemType.story,
-                        by: "foobar",
-                        time: Date(),
-                        text: "Foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar foo bar.",
-                        dead: false,
-                        parent: nil,
-                        poll: nil,
-                        url: "https://www.reuters.com/article/us-wework-ipo/wework-says-will-file-to-withdraw-ipo-idUSKBN1WF1NS",
-                        score: 312,
-                        title: "WeWork says will file to withdraw IPO, WeWork says will file to withdraw IPO",
-                        descendantsCount: 30)
+        let item = PreviewData.items[0]
         
         let itemView = ItemAndCommentsView(viewModel: ItemViewModel(item))
         
