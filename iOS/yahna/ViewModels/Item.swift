@@ -42,6 +42,7 @@ class Item : Identifiable, Hashable {
     var parts: [Item]?
     var kids: [Item]?
     var all: [Item]?
+    var idToIndexMap: [Int64: Int]?
     var depth: Int?
     
     var descendantsCount: Int64?
@@ -82,6 +83,7 @@ class Item : Identifiable, Hashable {
         attributedHNLink = Item.attributedLink(from: "https://news.ycombinator.com/item?id=\(id)", text: "HN", font: Fonts.caption.uiFont)
         
         all = [self]
+        idToIndexMap = [self.id: all!.count-1]
     }
     
     var linkAttributes: [NSAttributedString.Key : Any]? {
@@ -137,15 +139,18 @@ class Item : Identifiable, Hashable {
     
     func setAllItemsAndDepths() {
         var allItems = [Item]()
-        getAllItemsAndSetDepths(&allItems, depth: 0)
+        var idToIndexMap = [Int64: Int]()
+        getAllItemsAndSetDepths(&allItems, &idToIndexMap, depth: 0)
         self.all = allItems
+        self.idToIndexMap = idToIndexMap
     }
     
-    private func getAllItemsAndSetDepths(_ allItems: inout [Item], depth: Int) {
+    private func getAllItemsAndSetDepths(_ allItems: inout [Item], _ idToIndexMap: inout [Int64: Int], depth: Int) {
         self.depth = depth
         allItems.append(self)
-        parts?.forEach { $0.depth = depth+1; allItems.append($0) }
-        kids?.forEach { $0.getAllItemsAndSetDepths(&allItems, depth: depth+1) }
+        idToIndexMap[self.id] = allItems.count-1
+        parts?.forEach { $0.depth = depth+1; allItems.append($0); idToIndexMap[$0.id] = allItems.count-1 }
+        kids?.forEach { $0.getAllItemsAndSetDepths(&allItems, &idToIndexMap, depth: depth+1) }
     }
     
     func hash(into hasher: inout Hasher) {
@@ -229,5 +234,37 @@ extension Item {
         }
         
         return url
+    }
+}
+
+extension Item {
+    
+    func getSiblingsAndSiblingIndex(of item: Item) -> ([Item], Int)? {
+        
+        guard let all = self.all, let parentId = item.parent, let parentIdx = self.idToIndexMap?[parentId], parentIdx < all.count else {
+            return nil
+        }
+        
+        let parent = all[parentIdx]
+        
+        guard let kids = parent.kids, let childIdx = kids.firstIndex(where: { $0.id == item.id }) else {
+            return nil
+        }
+        
+        return (kids, childIdx)
+    }
+    
+    func getNextSibling(of item: Item) -> Item? {
+        guard let (siblings, idx) = getSiblingsAndSiblingIndex(of: item), idx < siblings.count-1 else {
+            return nil
+        }
+        return siblings[idx+1]
+    }
+    
+    func getPreviousSibling(of item: Item) -> Item? {
+        guard let (siblings, idx) = getSiblingsAndSiblingIndex(of: item), idx > 0, idx < siblings.count else {
+            return nil
+        }
+        return siblings[idx-1]
     }
 }

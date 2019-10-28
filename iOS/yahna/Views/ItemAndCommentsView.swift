@@ -12,16 +12,19 @@ struct ItemAndCommentsView: View {
     
     @ObservedObject var viewModel: ItemAndCommentsViewModel
     
+    let rootItemTypes: [ItemType] = [.story, .poll, .job]
+    
     var body: some View {
         GeometryReader { geometry in
             ZStack {
+                
                 CollectionView(self.viewModel.item.all ?? [Item](),
-                               contentOffset: self.$viewModel.contentOffset,
                                firstVisibleIndexPath: self.$viewModel.firstVisibleIndexPath,
+                               scrollToIndexPathPublisher: self.viewModel.scrollToIndexPathPublisher,
                                refresh: { DataProvider.shared.refreshViewModel(self.viewModel, force: true).map({ _ -> Void in }).eraseToAnyPublisher() },
                                cellSize: ItemAndCommentsView.cellSize) { (item) in
                                 
-                                if item.type == .story {
+                                if self.rootItemTypes.contains(item.type) {
                                     ItemView(viewModel: self.viewModel, availableWidth: geometry.size.width)
                                 } else if item.type == .comment {
                                     CommentView(item: item, availableWidth: geometry.size.width)
