@@ -13,13 +13,17 @@ struct CommentNavButton: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .frame(width: 20, height: 20, alignment: .center)
-            .padding(5)
-            .background(Color.white)
+            .foregroundColor(Color.white)
+            .frame(width: 25, height: 25, alignment: .center)
+            .padding(10)
+            .background(Color.blue)
             .clipShape(Circle())
+            .shadow(color: .gray, radius: 3, x: 0, y: 2)
             .overlay(
                 RoundedRectangle(cornerRadius: 100)
                     .stroke(Color.blue, lineWidth: 1)
+                    
+                
         )
     }
 }
@@ -55,20 +59,11 @@ struct CommentNavControlView: View {
         self.stepDownDisabled = stepDownDisabled
     }
     
-    let side = CGFloat(25)
+    let side = CGFloat(30)
     
     var body: some View {
-        ZStack {
-            Button(action: {
-                self.stepAction?(.out)
-            }) {
-                Image("stepOut")
-                    .resizable()
-                    .modifier(CommentNavButton())
-                    .disabled(stepOutDisabled)
-                
-            }.position(x: side*0.5, y: side*1.5)
-            
+        VStack {
+
             Button(action: {
                 self.stepAction?(.up)
             }) {
@@ -76,16 +71,7 @@ struct CommentNavControlView: View {
                     .resizable()
                     .modifier(CommentNavButton())
                     .disabled(stepUpDisabled)
-            }.position(x: side*1.5, y: side*0.5)
-            
-            Button(action: {
-                self.stepAction?(.down)
-            }) {
-                Image("stepOverDown")
-                    .resizable()
-                    .modifier(CommentNavButton())
-                    .disabled(stepDownDisabled)
-            }.position(x: side*1.5, y: side*2.5)
+            }
             
             Button(action: {
                 self.stepAction?(.into)
@@ -94,9 +80,17 @@ struct CommentNavControlView: View {
                     .resizable()
                     .modifier(CommentNavButton())
                     .disabled(stepIntoDisabled)
-            }.position(x: side*2.5, y: side*1.5)
+            }
+            
+            Button(action: {
+                self.stepAction?(.down)
+            }) {
+                Image("stepOverDown")
+                    .resizable()
+                    .modifier(CommentNavButton())
+                    .disabled(stepDownDisabled)
+            }
         }
-        .frame(width: side*3, height: side*3)
     }
 }
 

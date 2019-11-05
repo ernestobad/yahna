@@ -34,8 +34,8 @@ struct ItemAndCommentsView: View {
                 }
                 
                 CommentNavControlView(stepAction: self.viewModel.onStepButtonSelected)
-                    .position(x: geometry.size.width-300,
-                              y: geometry.size.height-100)
+                    .position(x: geometry.size.width-40,
+                              y: geometry.size.height-90)
                 
             }.onAppear {
                 DataProvider.shared.refreshViewModel(self.viewModel)

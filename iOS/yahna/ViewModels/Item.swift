@@ -239,13 +239,20 @@ extension Item {
 
 extension Item {
     
-    func getSiblingsAndSiblingIndex(of item: Item) -> ([Item], Int)? {
+    func getParent(of item: Item) -> Item? {
         
         guard let all = self.all, let parentId = item.parent, let parentIdx = self.idToIndexMap?[parentId], parentIdx < all.count else {
             return nil
         }
         
-        let parent = all[parentIdx]
+        return all[parentIdx]
+    }
+    
+    func getSiblingsAndSiblingIndex(of item: Item) -> ([Item], Int)? {
+        
+        guard let parent = getParent(of: item) else {
+            return nil
+        }
         
         guard let kids = parent.kids, let childIdx = kids.firstIndex(where: { $0.id == item.id }) else {
             return nil
@@ -256,6 +263,9 @@ extension Item {
     
     func getNextSibling(of item: Item) -> Item? {
         guard let (siblings, idx) = getSiblingsAndSiblingIndex(of: item), idx < siblings.count-1 else {
+            if let parent = getParent(of: item) {
+                return getNextSibling(of: parent)
+            }
             return nil
         }
         return siblings[idx+1]
@@ -263,6 +273,9 @@ extension Item {
     
     func getPreviousSibling(of item: Item) -> Item? {
         guard let (siblings, idx) = getSiblingsAndSiblingIndex(of: item), idx > 0, idx < siblings.count else {
+            if let parent = getParent(of: item) {
+                return parent
+            }
             return nil
         }
         return siblings[idx-1]
